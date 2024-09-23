@@ -1,34 +1,28 @@
 package com.zomato.cartService.Controller;
- 
-import java.util.Map;
-import java.util.Optional;
+
+import com.zomato.cartService.Entity.Cart;
+import com.zomato.cartService.Entity.CouponType;
+import com.zomato.cartService.Service.CartService;
+import com.zomato.cartService.Exception.CartNotFoundException;
+import com.zomato.cartService.DTO.UserDTO;
+import com.zomato.cartService.DTO.ItemsDTO;
+import com.zomato.cartService.DTO.VendorDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.zomato.cartService.Entity.Cart;
-import com.zomato.cartService.Entity.CouponType;
-import com.zomato.cartService.Exception.CartNotFoundException;
-import com.zomato.cartService.Service.CartService;
- 
+import java.util.Map;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/carts")
 public class CartController {
- 
+
     @Autowired
     private CartService cartService;
- 
+
     // View cart by cartId
     @GetMapping("/{cartId}")
     public ResponseEntity<Cart> viewCartById(@PathVariable Long cartId) {
@@ -39,7 +33,7 @@ public class CartController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
- 
+
     // Add items to cart
     @PostMapping("/add/{userId}/{vendorId}")
     public ResponseEntity<Cart> addItemToCart(@PathVariable Long userId, 
@@ -48,7 +42,7 @@ public class CartController {
         Cart cart = cartService.addItemToCart(userId, itemQuantities, vendorId);
         return new ResponseEntity<>(cart, HttpStatus.CREATED);
     }
- 
+
     // Add items by category to cart
     @PostMapping("/addByCategory/{userId}/{vendorId}/{categoryName}")
     public ResponseEntity<Cart> addItemToCartByCategory(@PathVariable Long userId, 
@@ -58,7 +52,7 @@ public class CartController {
         Cart cart = cartService.addItemToCartByCategory(userId, itemQuantities, vendorId, categoryName);
         return new ResponseEntity<>(cart, HttpStatus.CREATED);
     }
- 
+
     // Update items in the cart
     @PutMapping("/update/{cartId}/{userId}/{vendorId}")
     public ResponseEntity<Cart> updateCart(@PathVariable Long cartId, 
@@ -68,30 +62,36 @@ public class CartController {
         Cart updatedCart = cartService.updateCart(cartId, userId, itemQuantities, vendorId);
         return new ResponseEntity<>(updatedCart, HttpStatus.OK);
     }
-//    @PutMapping("/update/{cartId}")
-//    public ResponseEntity<Cart> updateCartByCartId(
-//            @PathVariable Long cartId, 
-//            @RequestBody Map<String, Integer> itemQuantities) {
-//
-//        // Update the cart using only the cartId and provided item quantities
-//        Cart updatedCart = cartService.updateCartByItems(cartId, itemQuantities);
-//        
-//        // Return the updated cart with a success response
-//        return new ResponseEntity<>(updatedCart, HttpStatus.OK);
-//    }
-    @PutMapping("/update/SideOns/{cartId}/{userId}/{vendorId}")
-    public ResponseEntity<Cart> updateCartBySideOns(@PathVariable Long cartId, 
-                                           @PathVariable Long userId, 
-                                           @RequestBody Map<String, Integer> itemQuantities,
-                                           @PathVariable Long vendorId) {
-        Cart updatedCart = cartService.updateCart(cartId, userId, itemQuantities, vendorId);
+    @PutMapping("/update/{cartId}")
+    public ResponseEntity<Cart> updateCartByCartId(
+            @PathVariable Long cartId, 
+            @RequestBody Map<String, Integer> itemQuantities) {
+
+        // Update the cart using only the cartId and provided item quantities
+        Cart updatedCart = cartService.updateCartByItems(cartId, itemQuantities);
+        
+        // Return the updated cart with a success response
         return new ResponseEntity<>(updatedCart, HttpStatus.OK);
     }
-
- 
     
- 
- 
+    
+   
+    
+// add-side ons to cart by cartid
+    @PutMapping("/update/addSideons/{cartId}")
+    public ResponseEntity<Cart> updateCartBySideOns(
+            @PathVariable Long cartId, 
+            @RequestBody Map<String, Integer> itemQuantities) {
+
+        // Update the cart using only the cartId and provided item quantities
+        Cart updatedCart = cartService.updateCartByItems(cartId, itemQuantities);
+        
+        // Return the updated cart with a success response
+        return new ResponseEntity<>(updatedCart, HttpStatus.OK);
+    }
+    
+
+
     // Delete cart by cartId
     @DeleteMapping("/{cartId}")
     public ResponseEntity<Void> deleteCartById(@PathVariable Long cartId) {
@@ -102,7 +102,7 @@ public class CartController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
- 
+
     // View cart by userId
     @GetMapping("/user/{userId}")
     public ResponseEntity<Cart> getCartByUserId(@PathVariable Long userId) {
@@ -113,6 +113,7 @@ public class CartController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    
     @PutMapping("/applyCoupon/{cartId}")
     public ResponseEntity<Cart> applyCouponToCart(
             @PathVariable Long cartId,
@@ -120,10 +121,11 @@ public class CartController {
         Cart updatedCart = cartService.updateCartWithCoupon(cartId, couponType);
         return new ResponseEntity<>(updatedCart, HttpStatus.OK);
     }
- 
+
     @PatchMapping("/{cartId}/cutlery")
     public ResponseEntity<Cart> updateCutlery(@PathVariable Long cartId, @RequestParam boolean hasCutlery) {
         Cart updatedCart = cartService.addCutleryToCart(cartId, hasCutlery);
         return ResponseEntity.ok(updatedCart);
     }
 }
+

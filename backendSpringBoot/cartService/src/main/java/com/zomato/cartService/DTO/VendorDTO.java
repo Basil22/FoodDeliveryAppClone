@@ -9,7 +9,10 @@ public class VendorDTO {
 	private String vendorContactNumber;
 	private String vendorAddress;
 	private boolean isOpen;
+
 	
+	
+
 	private List<ItemsDTO> itemList;
 
 	public int getVendorId() {

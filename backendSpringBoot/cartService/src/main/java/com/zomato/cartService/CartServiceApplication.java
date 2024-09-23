@@ -6,21 +6,20 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-
-@SpringBootApplication
 @EnableDiscoveryClient
+@SpringBootApplication
 public class CartServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CartServiceApplication.class, args);
 	}
 
-	@Configuration
-	public class AppConfig {
-		@Bean
-		RestTemplate restTemplate() {
-			return new RestTemplate();
-		}
-	}
+@Configuration
+public class AppConfig {
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
 
 }
