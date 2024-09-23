@@ -8,8 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.cg.order.dao.OrderDao;
-import com.cg.order.dto.CartDTo;
+import com.cg.order.dto.CartDTO;
 import com.cg.order.dto.OrderDto;
 import com.cg.order.dto.Payment;
 import com.cg.order.dto.PaymentStatus;
@@ -22,11 +21,12 @@ import com.cg.order.feignClient.CartClient;
 import com.cg.order.feignClient.PaymentClient;
 import com.cg.order.feignClient.UserClient;
 import com.cg.order.feignClient.VendorClient;
+import com.cg.order.repository.OrderRepository;
 
 @Service
 public class OrderServiceImpl implements OrderService {
 	@Autowired
-	private OrderDao orderDao;
+	private OrderRepository orderRepo;
 
 	@Autowired
 	private UserClient userClient;
@@ -75,12 +75,12 @@ public class OrderServiceImpl implements OrderService {
 		order.setTimeStamp(LocalDate.now());
 		paymentClient.updatePaymentStatus(order1.getPaymentId(), PaymentStatus.SUCCESS,
 				paymentDetails.getBody().getPaymentType());
-		ResponseEntity<CartDTo> cartById = cartClient.viewCartById(orders.getCartId());
+		ResponseEntity<CartDTO> cartById = cartClient.viewCartById(orders.getCartId());
 		
 		order.setCartId(orders.getCartId());
-		Order o = orderDao.save(order);
+		Order o = orderRepo.save(order);
 		System.out.println(o);
-		CartDTo cart = new CartDTo();
+		CartDTO cart = new CartDTO();
 		cart.setId(cartById.getBody().getId());
 		cart.setItemQuantities(cartById.getBody().getItemQuantities());
 		System.out.println(cartById.getBody());
@@ -94,7 +94,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Order updateOrder(Order order) throws IdNotFoundException, OrderStatusNotFoundException {
-		Order existingOrder = orderDao.findById(order.getOrderId())
+		Order existingOrder = orderRepo.findById(order.getOrderId())
 				.orElseThrow(() -> new IdNotFoundException("Order ID not found to update the order"));
 
 		ResponseEntity<Payment> paymentDetails = paymentClient.getPaymentDetails(order.getPaymentId());
@@ -108,14 +108,14 @@ public class OrderServiceImpl implements OrderService {
 		existingOrder.setTimeStamp(LocalDate.now());
 		paymentClient.updatePaymentStatus(existingOrder.getPaymentId(), PaymentStatus.FAILED,
 				paymentDetails.getBody().getPaymentType());
-		return orderDao.save(existingOrder);
+		return orderRepo.save(existingOrder);
 	}
 
 	@Override
 	public String deleteOrderById(Long orderId) throws IdNotFoundException {
-		Optional<Order> existingOrder = orderDao.findById(orderId);
+		Optional<Order> existingOrder = orderRepo.findById(orderId);
 		if (existingOrder.isPresent()) {
-			orderDao.deleteById(orderId);
+			orderRepo.deleteById(orderId);
 		} else {
 			throw new IdNotFoundException("Order ID not found to delete the order");
 		}
@@ -124,13 +124,13 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Order getOrderById(Long orderId) throws IdNotFoundException {
-		return orderDao.findById(orderId)
+		return orderRepo.findById(orderId)
 				.orElseThrow(() -> new IdNotFoundException("Order ID " + orderId + " not found"));
 	}
 
 	@Override
 	public List<Order> getAllOrders() {
-		List<Order> orders = orderDao.findAll();
+		List<Order> orders = orderRepo.findAll();
 		if (orders.isEmpty()) {
 			throw new IdNotFoundException("No orders found in the system.");
 		}
@@ -139,7 +139,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<Order> getOrderByUserId(Long id) {
-		List<Order> orders = orderDao.findByUserId(id);
+		List<Order> orders = orderRepo.findByUserId(id);
 		if (orders.isEmpty()) {
 			throw new IdNotFoundException("No orders found By this user id " + id);
 		}
@@ -148,7 +148,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<Order> getorderByVendorName(String name) {
-		List<Order> orders = orderDao.findByVendorName(name);
+		List<Order> orders = orderRepo.findByVendorName(name);
 		if (orders.isEmpty()) {
 			throw new IdNotFoundException("No orders found By this restaurant name " + name);
 		}
@@ -157,7 +157,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<Order> getorderByVendorNameStatus(String name, String status) {
-		List<Order> orders = orderDao.findByVendorNameAndStatus(name, status);
+		List<Order> orders = orderRepo.findByVendorNameAndStatus(name, status);
 		if (orders.isEmpty()) {
 			throw new IdNotFoundException(
 					"No orders found By this restaurant name " + name + " with this status " + status);

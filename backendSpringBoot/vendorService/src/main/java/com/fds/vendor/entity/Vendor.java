@@ -17,39 +17,39 @@ import jakarta.validation.constraints.Pattern;
 public class Vendor {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int vendorId;
 
-	@NotBlank(message="Vendor name cannot be null or blank.")
-	@Pattern(regexp="^(.{4,})$", message="Vendor name must have atleast 4 characters.")
+	@NotBlank(message = "Vendor name cannot be null or blank.")
+	@Pattern(regexp = "^(.{4,})$", message = "Vendor name must have atleast 4 characters.")
 	private String vendorName;
-	
+
 	@NotBlank(message = "Contact number cannot be null or blank.")
 	@Pattern(regexp = "^(?!([6-9])\\1{9})[6-9]\\d{9}$", message = "Phone number must be 10 digits and start with 6, 7, 8, or 9")
 	private String vendorContactNumber;
-	
-	@NotBlank(message="Address cannot be null or blank.")
-	@Pattern(regexp="^(.{10,})$", message="Address must have atleast 10 characters.")
+
+	@NotBlank(message = "Address cannot be null or blank.")
+	@Pattern(regexp = "^(.{10,})$", message = "Address must have atleast 10 characters.")
 	private String vendorAddress;
-	
-	@NotBlank(message="Fssai license cannot be null or blank.")
-	@Pattern(regexp="^\\d{14}$", message="Fssai must be 14 digits.")
+
+	@NotBlank(message = "Fssai license cannot be null or blank.")
+	@Pattern(regexp = "^\\d{14}$", message = "Fssai must be 14 digits.")
 	private String fssaiLicenseNumber;
-	
+
 	private boolean isOpen;
 
-	@OneToMany(mappedBy="vendor", cascade=CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private List<Items> itemList;
-	
-	//BOILERPLATE CODE BELOW
-	
+
+	// BOILERPLATE CODE BELOW
+
 	public Vendor() {
-		
+
 	}
 
-	public Vendor(int vendorId, String vendorName, String vendorContactNumber, String vendorAddress, String fssai, boolean isOpen,
-			List<Items> itemList) {
+	public Vendor(int vendorId, String vendorName, String vendorContactNumber, String vendorAddress, String fssai,
+			boolean isOpen, List<Items> itemList) {
 		super();
 		this.vendorId = vendorId;
 		this.vendorName = vendorName;
@@ -59,8 +59,6 @@ public class Vendor {
 		this.isOpen = isOpen;
 		this.itemList = itemList;
 	}
-	
-	
 
 	public String getFssaiLicenseNumber() {
 		return fssaiLicenseNumber;

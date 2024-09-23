@@ -46,38 +46,33 @@ public class OrderController {
 	}
 
 	@GetMapping("/orderByorderId/{id}")
-	public ResponseEntity<Order> getorderById(@PathVariable Long id)
-			throws IdNotFoundException {
+	public ResponseEntity<Order> getorderById(@PathVariable Long id) throws IdNotFoundException {
 		return ResponseEntity.ok(orderService.getOrderById(id));
 	}
-	
+
 	@GetMapping("/allOrders")
-	public ResponseEntity<List<Order>> getAllOrders()
-			throws IdNotFoundException {
+	public ResponseEntity<List<Order>> getAllOrders() throws IdNotFoundException {
 		return ResponseEntity.ok(orderService.getAllOrders());
 	}
-	
+
 	@GetMapping("/orderByUserId/{id}")
-	public ResponseEntity<List<Order>> getorderByUserId(@PathVariable Long id)
-			throws IdNotFoundException {
+	public ResponseEntity<List<Order>> getorderByUserId(@PathVariable Long id) throws IdNotFoundException {
 		return ResponseEntity.ok(orderService.getOrderByUserId(id));
 	}
-	
+
 	@GetMapping("/orderByVendorName/{name}")
-	public ResponseEntity<List<Order>> getorderByVendorName(@PathVariable String name)
-			throws IdNotFoundException {
+	public ResponseEntity<List<Order>> getorderByVendorName(@PathVariable String name) throws IdNotFoundException {
 		return ResponseEntity.ok(orderService.getorderByVendorName(name));
 	}
-	
+
 	@GetMapping("/orderByVendorNameStatus/{name}/{status}")
 	public ResponseEntity<List<Order>> getorderByVendorName(@PathVariable String name, @PathVariable String status)
 			throws IdNotFoundException {
-		String statuss=status.toUpperCase();
-		if(!(statuss.equalsIgnoreCase("PLACED")||statuss.equalsIgnoreCase("CANCELLED"))) {
+		String statuss = status.toUpperCase();
+		if (!(statuss.equalsIgnoreCase("PLACED") || statuss.equalsIgnoreCase("CANCELLED"))) {
 			throw new IdNotFoundException("Status should be PLACED or CANCELLLED");
 		}
-		return ResponseEntity.ok(orderService.getorderByVendorNameStatus(name,statuss));
+		return ResponseEntity.ok(orderService.getorderByVendorNameStatus(name, statuss));
 	}
-
 
 }
