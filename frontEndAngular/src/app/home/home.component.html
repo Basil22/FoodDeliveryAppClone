@@ -1,20 +1,22 @@
 <div class="container mt-5">
   <div class="row">
     <div class="col-md-12 text-center">
-      <h2 class="mb-4">Search Restaurants</h2>
+      <h2 class="mb-4">Search Restaurants or Items</h2>
       <input
         type="text"
         [(ngModel)]="searchTerm"
         placeholder="Enter restaurant name or item name"
         class="form-control mb-3"
+        (keydown.enter)="searchItemsOrVendors()"
       />
-      <button (click)="searchRestaurants()" class="btn btn-primary">
+      <button (click)="searchItemsOrVendors()" class="btn btn-primary">
         Search
       </button>
     </div>
   </div>
 
-  <div class="row">
+  <!-- Display Items Section -->
+  <div class="row" *ngIf="isItemSearch">
     <div class="col-md-4" *ngFor="let item of items">
       <div class="card mb-4 shadow-sm text-center">
         <img
@@ -22,9 +24,21 @@
           class="card-img-top"
           alt="{{ item.itemName }}"
         />
-
         <div class="card-body">
           <h5 class="card-title">{{ item.itemName | titlecase }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Display Vendors Section -->
+  <div class="row" *ngIf="!isItemSearch">
+    <div class="col-md-4" *ngFor="let vendor of vendors">
+      <div class="card mb-4 shadow-sm text-center">
+        <div class="card-body">
+          <h5 class="card-title">{{ vendor.vendorName | titlecase }}</h5>
+          <p class="card-text">Address: {{ vendor.vendorAddress }}</p>
+          <p class="card-text">Contact: {{ vendor.vendorContactNumber }}</p>
         </div>
       </div>
     </div>

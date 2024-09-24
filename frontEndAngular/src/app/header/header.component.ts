@@ -5,10 +5,8 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  styleUrls: ['./header.component.css'],
 })
 export class HeaderComponent {
-  restaurantName = 'Your Restaurant Name';
-
-  
+  restaurantName = 'ZomatoClone';
 }
