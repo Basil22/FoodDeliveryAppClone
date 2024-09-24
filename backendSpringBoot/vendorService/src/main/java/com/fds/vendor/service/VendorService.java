@@ -22,5 +22,5 @@ public interface VendorService {
 	public List<Vendor> getNearestVendors(long userId);
 	
 	public Integer getDistanceBetweenVendorAndUser(long userId, int vendorId);
-
+	
 	}

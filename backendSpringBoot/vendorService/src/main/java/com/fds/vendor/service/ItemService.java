@@ -30,4 +30,6 @@ public interface ItemService {
 
 	// Show all available items
 	public List<Items> allAvailableItemsInVendor(String vendorName);
+	
+	public List<Items> viewAllItems();
 }

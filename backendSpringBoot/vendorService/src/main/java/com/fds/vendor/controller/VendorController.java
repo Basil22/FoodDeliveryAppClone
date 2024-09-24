@@ -166,4 +166,10 @@ public class VendorController {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(vendorService.getDistanceBetweenVendorAndUser(userId, vendorId));
 	}
+
+	@GetMapping("/allItems")
+	public ResponseEntity<List<Items>> getAllItems() {
+		return ResponseEntity.status(HttpStatus.OK).body(itemService.viewAllItems());
+
+	}
 }

@@ -326,4 +326,9 @@ public class VendorServiceImpl implements VendorService, ItemService {
 
 		return (int) calculateDistance(userCoordinates, vendorCoordinates);
 	}
+
+	@Override
+	public List<Items> viewAllItems() {
+		return itemRepo.findAll();
+	}
 }
