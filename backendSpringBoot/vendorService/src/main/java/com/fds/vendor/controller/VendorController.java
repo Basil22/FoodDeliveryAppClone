@@ -160,9 +160,9 @@ public class VendorController {
 		return ResponseEntity.status(HttpStatus.OK).body(vendorService.getNearestVendors(userId));
 	}
 
-	@GetMapping("/user/distance")
-	public ResponseEntity<Integer> distanceBetweenUserAndVendor(@RequestParam @Positive long userId,
-			@RequestParam @Positive int vendorId) {
+	@GetMapping("/user/distance/{userId}/{vendorId}")
+	public ResponseEntity<Integer> distanceBetweenUserAndVendor(@PathVariable @Positive long userId,
+			@PathVariable @Positive int vendorId) {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(vendorService.getDistanceBetweenVendorAndUser(userId, vendorId));
 	}
