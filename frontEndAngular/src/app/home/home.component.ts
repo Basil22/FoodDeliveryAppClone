@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Item } from '../models/item';
 import { ItemService } from '../services/item.service';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -26,14 +27,12 @@ export class HomeComponent implements OnInit {
     });
   }
   searchRestaurants() {
-    this.itemService.getItemsOfVendorByName(this.searchTerm).subscribe(
-      (data: any) => {
-        this.items = data; // Update items with the search results
-      },
+    this.itemService.getItemsOfVendorByName(this.searchTerm).pipe(
+      tap((data: any) => this.items = data)
+    ).subscribe();
       (  error: any) => {
         console.error('Error fetching restaurants:', error);
-      }
-    );
+      };
   }
   
   getImageUrl(itemName: string): string {
