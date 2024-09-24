@@ -38,7 +38,4 @@ export class HomeComponent implements OnInit {
   getImageUrl(itemName: string): string {
     return `/assets/images/${itemName.toLowerCase().replace(/ /g, '-')}.png`;
   }
-  
-  
-  
 }
