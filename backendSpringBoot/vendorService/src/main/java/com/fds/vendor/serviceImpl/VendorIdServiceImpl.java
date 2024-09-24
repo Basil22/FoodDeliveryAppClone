@@ -58,7 +58,7 @@ public class VendorIdServiceImpl implements ByIdService {
 		}
 
 		List<Items> itemsByCategory = vendor.getItemList().stream()
-				.filter(item -> item.getCategory().equals(categoryName)).collect(Collectors.toList());
+				.filter(item -> item.getCategory().equals(categoryName.toLowerCase())).collect(Collectors.toList());
 
 		if (itemsByCategory.isEmpty()) {
 			throw new ItemNotFoundException(

@@ -92,7 +92,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 	@Override
 	public String updateVendorNameNumberAddressFssaiByName(String vendorName, Vendor vendor) {
 
-		vendorRepo.findByVendorName(vendorName).ifPresentOrElse(v -> {
+		vendorRepo.findByVendorName(vendorName.toLowerCase()).ifPresentOrElse(v -> {
 			v.setAddress(vendor.getAddress());
 			v.setContactNumber(vendor.getContactNumber());
 			v.setVendorName(vendor.getVendorName().toLowerCase());
@@ -121,7 +121,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 	@Override
 	public String deleteVendorByName(String vendorName) {
 
-		Optional<Vendor> savedVendor = vendorRepo.findByVendorName(vendorName);
+		Optional<Vendor> savedVendor = vendorRepo.findByVendorName(vendorName.toLowerCase());
 		if (!savedVendor.isPresent()) {
 			throw new VendorDoesNotExistException(vendorName + " does not exist.");
 		}
@@ -133,7 +133,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 	@Override
 	public void vendorOpenCloseToggle(String vendorName) {
 
-		vendorRepo.findByVendorName(vendorName).ifPresentOrElse(e -> {
+		vendorRepo.findByVendorName(vendorName.toLowerCase()).ifPresentOrElse(e -> {
 			e.setIsOpen(!e.isOpen());
 			vendorRepo.save(e);
 		}, () -> {
@@ -151,7 +151,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 	@Override
 	public String addItemToVendor(Items item, String vendorName) {
 
-		Vendor savedVendor = vendorRepo.findByVendorName(vendorName)
+		Vendor savedVendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
 				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
 		if (savedVendor.getItemList() == null) {
 			savedVendor.setItemList(new ArrayList<>());
@@ -176,7 +176,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 	@Override
 	public String updateItemDetailsInVendor(String vendorName, String itemName, Items item) {
 
-		Vendor vendor = vendorRepo.findByVendorName(vendorName)
+		Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
 				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
 
 		if (vendor.getItemList() == null || vendor.getItemList().isEmpty()) {
@@ -184,7 +184,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 		}
 
 		Items savedItem = vendor.getItemList().stream()
-				.filter(existingItem -> existingItem.getItemName().equals(itemName)).findFirst()
+				.filter(existingItem -> existingItem.getItemName().equals(itemName.toLowerCase())).findFirst()
 				.orElseThrow(() -> new ItemNotFoundException(itemName + " does not exist in " + vendorName));
 
 		savedItem.setItemName(item.getItemName());
@@ -200,7 +200,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 
 	@Override
 	public String deleteItemFromVendor(String vendorName, String itemName) {
-		Vendor vendor = vendorRepo.findByVendorName(vendorName)
+		Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
 				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
 
 		if (vendor.getItemList() == null || vendor.getItemList().isEmpty()) {
@@ -208,7 +208,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 		}
 
 		Items savedItem = vendor.getItemList().stream()
-				.filter(existingItem -> existingItem.getItemName().equals(itemName)).findFirst()
+				.filter(existingItem -> existingItem.getItemName().equals(itemName.toLowerCase())).findFirst()
 				.orElseThrow(() -> new ItemNotFoundException(itemName + " does not exist in " + vendorName));
 
 		vendor.getItemList().remove(savedItem);
@@ -220,14 +220,14 @@ public class VendorServiceImpl implements VendorService, ItemService {
 	@Override
 	public Items viewItemInRestaurant(String vendorName, String itemName) {
 
-		Vendor vendor = vendorRepo.findByVendorName(vendorName)
+		Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
 				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
 
 		if (vendor.getItemList() == null || vendor.getItemList().isEmpty()) {
 			throw new ItemNotFoundException(vendorName + " does not have any items.");
 		}
 
-		Items existingItem = vendor.getItemList().stream().filter(item -> item.getItemName().equals(itemName))
+		Items existingItem = vendor.getItemList().stream().filter(item -> item.getItemName().equals(itemName.toLowerCase()))
 				.findFirst()
 				.orElseThrow(() -> new ItemNotFoundException(itemName + " does not exist in " + vendorName));
 
@@ -236,7 +236,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 
 	@Override
 	public void itemAvailabilityToggle(String vendorName, String itemName) {
-		Vendor vendor = vendorRepo.findByVendorName(vendorName)
+		Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
 				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
 
 		if (vendor.getItemList() == null || vendor.getItemList().isEmpty()) {
@@ -244,7 +244,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 		}
 
 		Items savedItem = vendor.getItemList().stream()
-				.filter(existingItem -> existingItem.getItemName().equals(itemName)).findFirst()
+				.filter(existingItem -> existingItem.getItemName().equals(itemName.toLowerCase())).findFirst()
 				.orElseThrow(() -> new ItemNotFoundException(itemName + " does not exist in " + vendorName));
 
 		savedItem.setIsAvailable(!savedItem.isAvailable());
@@ -253,7 +253,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 
 	@Override
 	public List<Items> viewItemsInVendor(String vendorName) {
-		Vendor vendor = vendorRepo.findByVendorName(vendorName)
+		Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
 				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
 
 		return vendor.getItemList();
@@ -262,7 +262,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 	@Override
 	public List<Vendor> allVendorsWithItem(String itemName) {
 
-		List<Vendor> vendors = itemRepo.findVendorsByItemName(itemName);
+		List<Vendor> vendors = itemRepo.findVendorsByItemName(itemName.toLowerCase());
 		if (vendors.isEmpty()) {
 			throw new ItemNotFoundException(itemName + " not found in any vendor.");
 		}
@@ -272,7 +272,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 
 	@Override
 	public List<Items> allAvailableItemsInVendor(String vendorName) {
-		Vendor vendor = vendorRepo.findByVendorName(vendorName)
+		Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
 				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
 
 		return vendor.getItemList().stream().filter(item -> item.isAvailable() == true).toList();
