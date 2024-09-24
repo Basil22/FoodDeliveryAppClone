@@ -1,5 +1,10 @@
 import { TestBed } from '@angular/core/testing';
+<<<<<<< HEAD
 import { VendorService } from './vendor.service';
+=======
+
+import { VendorService } from '../vendor.service';
+>>>>>>> origin/main
 
 describe('VendorService', () => {
   let service: VendorService;

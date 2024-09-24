@@ -23,6 +23,7 @@ export class HomeComponent implements OnInit {
     private itemService: ItemService,
     private vendorService: VendorService
   ) {}
+  
 
   ngOnInit(): void {
     this.getItems();
