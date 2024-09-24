@@ -18,13 +18,26 @@
     <div class="col-md-4" *ngFor="let item of items">
       <div class="card mb-4 shadow-sm text-center">
         <img
-          [src]="getImageUrl(item.itemName)"
+          [src]="getItemImageUrl(item.itemName)"
           class="card-img-top"
           alt="{{ item.itemName }}"
         />
-
         <div class="card-body">
-          <h5 class="card-title">{{ item.itemName | titlecase }}</h5>
+          <h5 class="card-title">
+            {{ item.itemName | titlecase }}
+          </h5>
+          <h6 class="card-body">Rs. {{ item.itemPrice }}</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Display Vendors Section -->
+  <div class="row" *ngIf="!isItemSearch">
+    <div class="col-md-4" *ngFor="let vendor of vendors">
+      <div class="card mb-4 shadow-sm text-center">
+        <div class="card-body">
+          <h5 class="card-title">{{ vendor.vendorName | titlecase }}</h5>
         </div>
       </div>
     </div>

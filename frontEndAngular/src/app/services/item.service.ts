@@ -22,10 +22,4 @@ export class ItemService {
     const encodedVendorName = encodeURIComponent(vendorName);
     return this.http.get<any>(`${this.apiUrl}/${encodedVendorName}/items/all`);
   }
-
-  getVendorsByItemName(itemName: string): Observable<any> {
-    console.log('Item Name:', itemName);
-    const encodedItemName = encodeURIComponent(itemName);
-    return this.http.get<any>(`${this.apiUrl}/items/${encodedItemName}`);
-  }
 }
