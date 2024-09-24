@@ -25,7 +25,10 @@
           alt="{{ item.itemName }}"
         />
         <div class="card-body">
-          <h5 class="card-title">{{ item.itemName | titlecase }}</h5>
+          <h5 class="card-title">
+            {{ item.itemName | titlecase }}
+          </h5>
+          <h6 class="card-body">Rs. {{ item.itemPrice }}</h6>
         </div>
       </div>
     </div>

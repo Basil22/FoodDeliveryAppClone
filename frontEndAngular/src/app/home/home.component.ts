@@ -19,7 +19,10 @@ export class HomeComponent implements OnInit {
   searchTerm: string = '';
   vendors: Vendor[] = [];
   isItemSearch: boolean = true;
-  constructor(private itemService: ItemService, private vendorService: VendorService) {}
+  constructor(
+    private itemService: ItemService,
+    private vendorService: VendorService
+  ) {}
 
   ngOnInit(): void {
     this.getItems();
