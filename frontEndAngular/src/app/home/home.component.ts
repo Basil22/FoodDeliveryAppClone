@@ -10,12 +10,12 @@ import { tap } from 'rxjs';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
-  items: Item[] = [];  // Array to hold the items fetched from backend
+  items: Item[] = []; // Array to hold the items fetched from backend
   searchTerm: string = '';
-  constructor(private itemService: ItemService) { }
+  constructor(private itemService: ItemService) {}
 
   ngOnInit(): void {
     this.getItems();
@@ -27,14 +27,15 @@ export class HomeComponent implements OnInit {
     });
   }
   searchRestaurants() {
-    this.itemService.getItemsOfVendorByName(this.searchTerm).pipe(
-      tap((data: any) => this.items = data)
-    ).subscribe();
-      (  error: any) => {
-        console.error('Error fetching restaurants:', error);
-      };
+    this.itemService
+      .getItemsOfVendorByName(this.searchTerm)
+      .pipe(tap((data: any) => (this.items = data)))
+      .subscribe();
+    (error: any) => {
+      console.error('Error fetching restaurants:', error);
+    };
   }
-  
+
   getImageUrl(itemName: string): string {
     return `/assets/images/${itemName.toLowerCase().replace(/ /g, '-')}.png`;
   }

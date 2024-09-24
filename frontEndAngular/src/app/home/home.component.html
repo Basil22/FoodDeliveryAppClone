@@ -1,25 +1,32 @@
 <div class="container mt-5">
-    <div class="row">
-      <div class="col-md-12 text-center">
-        <h2 class="mb-4">Search Restaurants</h2>
-        <input type="text" [(ngModel)] ="searchTerm" placeholder="Enter restaurant name" class="form-control mb-3" />
-        <button (click)="searchRestaurants()" class="btn btn-primary">Search</button>
-      </div>
+  <div class="row">
+    <div class="col-md-12 text-center">
+      <h2 class="mb-4">Search Restaurants</h2>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Enter restaurant name"
+        class="form-control mb-3"
+      />
+      <button (click)="searchRestaurants()" class="btn btn-primary">
+        Search
+      </button>
     </div>
-  
-    <div class="row">
-      <div class="col-md-4" *ngFor="let item of items">
-        <div class="card mb-4 shadow-sm text-center">
-            <img 
-              [src]="getImageUrl(item.itemName)" 
-              class="card-img-top" 
-              alt="{{ item.itemName }}">
-             
-               
-          <div class="card-body">
-            <h5 class="card-title">{{ item.itemName }}</h5>
-          </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4" *ngFor="let item of items">
+      <div class="card mb-4 shadow-sm text-center">
+        <img
+          [src]="getImageUrl(item.itemName)"
+          class="card-img-top"
+          alt="{{ item.itemName }}"
+        />
+
+        <div class="card-body">
+          <h5 class="card-title">{{ item.itemName }}</h5>
         </div>
       </div>
     </div>
+  </div>
 </div>
