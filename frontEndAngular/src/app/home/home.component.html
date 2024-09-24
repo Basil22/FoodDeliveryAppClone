@@ -5,7 +5,7 @@
       <input
         type="text"
         [(ngModel)]="searchTerm"
-        placeholder="Enter restaurant name"
+        placeholder="Enter restaurant name or item name"
         class="form-control mb-3"
       />
       <button (click)="searchRestaurants()" class="btn btn-primary">
@@ -24,7 +24,7 @@
         />
 
         <div class="card-body">
-          <h5 class="card-title">{{ item.itemName }}</h5>
+          <h5 class="card-title">{{ item.itemName | titlecase }}</h5>
         </div>
       </div>
     </div>

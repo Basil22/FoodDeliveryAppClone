@@ -3,7 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Item } from '../models/item';
 import { ItemService } from '../services/item.service';
-import { tap } from 'rxjs';
+import { catchError, of, tap } from 'rxjs';
+import { Vendor } from '../models/vendor';
 
 @Component({
   selector: 'app-home',
@@ -15,6 +16,7 @@ import { tap } from 'rxjs';
 export class HomeComponent implements OnInit {
   items: Item[] = []; // Array to hold the items fetched from backend
   searchTerm: string = '';
+  vendors: Vendor[] = [];
   constructor(private itemService: ItemService) {}
 
   ngOnInit(): void {
@@ -33,6 +35,16 @@ export class HomeComponent implements OnInit {
       .subscribe();
     (error: any) => {
       console.error('Error fetching restaurants:', error);
+    };
+  }
+
+  searchItems() {
+    this.itemService
+      .getVendorsByItemName(this.searchTerm)
+      .pipe(tap((data: any) => (this.items = data)))
+      .subscribe();
+    (error: any) => {
+      console.log('Error fetching items:', error);
     };
   }
 

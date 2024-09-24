@@ -5,6 +5,9 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ItemService {
+  getItemsByName(searchTerm: string) {
+    throw new Error('Method not implemented.');
+  }
   private apiUrl = 'http://localhost:8080/api/vendor'; // URL of your backend API endpoint
 
   constructor(private http: HttpClient) {}
@@ -18,5 +21,11 @@ export class ItemService {
     console.log('Vendor Name:', vendorName); // Debugging line
     const encodedVendorName = encodeURIComponent(vendorName);
     return this.http.get<any>(`${this.apiUrl}/${encodedVendorName}/items/all`);
+  }
+
+  getVendorsByItemName(itemName: string): Observable<any> {
+    console.log('Item Name:', itemName);
+    const encodedItemName = encodeURIComponent(itemName);
+    return this.http.get<any>(`${this.apiUrl}/items/${encodedItemName}`);
   }
 }
