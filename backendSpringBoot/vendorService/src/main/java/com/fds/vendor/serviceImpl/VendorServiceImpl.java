@@ -114,7 +114,7 @@ public class VendorServiceImpl implements VendorService, ItemService {
 
 	@Override
 	public Vendor viewVendorDetailsByName(String vendorName) {
-		Optional<Vendor> savedVendor = vendorRepo.findByVendorName(vendorName);
+		Optional<Vendor> savedVendor = vendorRepo.findByVendorName(vendorName.toLowerCase());
 		return savedVendor.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
 	}
 
