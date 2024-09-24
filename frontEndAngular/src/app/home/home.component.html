@@ -39,6 +39,11 @@
     <div class="col-md-4" *ngFor="let vendor of vendors">
       <div class="card mb-4 shadow-sm text-center">
         <div class="card-body">
+          <img
+            [src]="getVendorImage(vendor.vendorName)"
+            class="card-img-top"
+            alt="{{ vendor.vendorName }}"
+          />
           <h5 class="card-title">{{ vendor.vendorName | titlecase }}</h5>
           <p class="card-text">Address: {{ vendor.vendorAddress }}</p>
           <p class="card-text">Contact: {{ vendor.vendorContactNumber }}</p>

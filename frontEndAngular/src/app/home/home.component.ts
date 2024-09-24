@@ -23,7 +23,6 @@ export class HomeComponent implements OnInit {
     private itemService: ItemService,
     private vendorService: VendorService
   ) {}
-  
 
   ngOnInit(): void {
     this.getItems();
@@ -80,31 +79,41 @@ export class HomeComponent implements OnInit {
   }
 
   searchItemsOrVendors(): void {
-    this.itemService.getItemsOfVendorByName(this.searchTerm).subscribe(
-      (data: Item[]) => {
+    // First, check if the search term is likely an item or a vendor
+    this.itemService.getItemsOfVendorByName(this.searchTerm).subscribe({
+      next: (data: Item[]) => {
         if (data.length > 0) {
           this.items = data;
-          this.isItemSearch = true; // Flag that we are displaying items
+          this.isItemSearch = true; // Display items if found
         } else {
+          // If no items found, search for vendors
           this.searchVendors();
         }
       },
-      (error) => {
-        console.error('Error fetching items:', error);
-        this.searchVendors(); // Fallback to search vendors if item search fails
-      }
-    );
+      error: (err) => {
+        console.error('Error fetching items:', err);
+        // Fallback to search vendors if item search fails
+        this.searchVendors();
+      },
+      complete: () => {
+        // Handle completion
+      },
+    });
   }
 
+  // Add a method to search for vendors based on the search term
   searchVendors(): void {
-    this.vendorService.getVendorsByItemName(this.searchTerm).subscribe(
-      (data: Vendor[]) => {
+    this.vendorService.getVendorsByItemName(this.searchTerm).subscribe({
+      next: (data: Vendor[]) => {
         this.vendors = data;
-        this.isItemSearch = false; // Flag that we are displaying vendors
+        this.isItemSearch = false;
       },
-      (error) => {
-        console.error('Error fetching vendors:', error);
-      }
-    );
+      error: (err) => {
+        console.error('Error fetching vendors', err);
+      },
+      complete: () => {
+        console.log('Vendor fetch complete');
+      },
+    });
   }
 }
