@@ -1,17 +1,19 @@
 <div class="container mt-5">
   <div class="row">
     <div class="col-md-12 text-center">
-      <h2 class="mb-4">Search Restaurants or Items</h2>
-      <input
-        type="text"
-        [(ngModel)]="searchTerm"
-        placeholder="Enter restaurant name or item name"
-        class="form-control mb-3"
-        (keydown.enter)="searchItemsOrVendors()"
-      />
-      <button (click)="searchItemsOrVendors()" class="btn btn-primary">
-        Search
-      </button>
+      <div class="input-group mb-3">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Enter restaurant name or item name"
+          class="form-control"
+          id="searchInput"
+          (keydown.enter)="searchItemsOrVendors()"
+        />
+        <button (click)="searchItemsOrVendors()" class="btn btn-primary">
+          Search
+        </button>
+      </div>
     </div>
   </div>
 
@@ -23,12 +25,29 @@
           [src]="getItemImageUrl(item.itemName)"
           class="card-img-top"
           alt="{{ item.itemName }}"
+          (click)="showItemDetails(item)"
+          data-bs-toggle="modal"
+          data-bs-target="#itemDetailsModal"
         />
+
         <div class="card-body">
-          <h5 class="card-title">
-            {{ item.itemName | titlecase }}
-          </h5>
-          <h6 class="card-body">Rs. {{ item.itemPrice }}</h6>
+          <h5 class="card-title">{{ item.itemName | titlecase }}</h5>
+          <h5 class="card-text">{{ getVendorName(item.vendorId) | titlecase }}</h5>
+          <h6 class="card-body">Rs. {{ item.price | currency }}</h6>
+
+          <!-- Add to Cart Button -->
+          <button (click)="addToCart(item)" class="btn btn-success">Add</button>
+
+          <!-- Quantity Control -->
+          <div *ngIf="localQuantities[item.itemName] > 0" class="mb-3">
+            <button (click)="decreaseQuantity(item)" class="btn btn-secondary">
+              -
+            </button>
+            <span class="mx-3">{{ localQuantities[item.itemName] || 1 }}</span>
+            <button (click)="increaseQuantity(item)" class="btn btn-secondary">
+              +
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -45,8 +64,60 @@
             alt="{{ vendor.vendorName }}"
           />
           <h5 class="card-title">{{ vendor.vendorName | titlecase }}</h5>
-          <p class="card-text">Address: {{ vendor.vendorAddress }}</p>
-          <p class="card-text">Contact: {{ vendor.vendorContactNumber }}</p>
+          <p class="card-text">Address: {{ vendor.address }}</p>
+          <p class="card-text">Contact: {{ vendor.contactNumber }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for displaying item details -->
+  <div
+    class="modal fade"
+    id="itemDetailsModal"
+    tabindex="-1"
+    aria-labelledby="itemDetailsModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="itemDetailsModalLabel">
+            {{ selectedItem?.itemName }}
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <img
+            [src]="getItemImageUrl(selectedItem?.itemName)"
+            class="img-fluid mb-3"
+            alt="{{ selectedItem?.itemName }}"
+          />
+          <p><strong>Price:</strong> Rs. {{ selectedItem?.price }}</p>
+          <p><strong>Description:</strong> {{ selectedItem?.description }}</p>
+          <p><strong>Ratings:</strong> {{ selectedItem?.ratings }}</p>
+          <p><strong>Vendor:</strong> {{ getVendorName(selectedItem?.vendorId) }}</p>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="addToCart(selectedItem)"
+          >
+            Add to Cart
+          </button>
         </div>
       </div>
     </div>

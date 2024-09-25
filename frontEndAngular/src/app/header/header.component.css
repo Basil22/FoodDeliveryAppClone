@@ -2,13 +2,14 @@
 .navbar-brand {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #2362a1;
+    color: #d66310;
   }
   
   /* Register and Login links */
   .nav-link {
     font-size: 1.2rem;
-    color: #007bff;
+    color: #d66310;
+    font-weight: bold;
     transition: color 0.3s ease;
   }
   

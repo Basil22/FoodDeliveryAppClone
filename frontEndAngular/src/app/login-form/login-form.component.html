@@ -1,0 +1,33 @@
+
+<!-- login.component.html -->
+<div class="login-wrapper">
+    <div class="login-container">
+      <h2 class="login-title">Login</h2>
+      <form>
+     <!-- (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form" -->
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number</label>
+          <input
+            type="text"
+            id="phoneNumber"
+            name="phoneNumber"
+            class="form-control"
+            required
+            pattern="[0-9]{10}"
+            placeholder="Enter your phone number"/>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-control"
+            required
+            minlength="6"
+            placeholder="Enter your password"/>
+        </div>
+      <button class = "btn"> Login </button>
+      </form>
+    </div>
+  </div>

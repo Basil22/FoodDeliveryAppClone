@@ -1,4 +1,4 @@
-import { Item } from './item';
+import { Item } from "./item";
 
 export interface Vendor {
   vendorId: number;
@@ -7,5 +7,8 @@ export interface Vendor {
   vendorAddress: string;
   fssaiLicenseNumber: string;
   isOpen: boolean;
-  itemList: Item[];
+  itemList: Item[]; 
+  open: boolean; 
+  address: string; 
+  contactNumber: string;// Assuming 'Item' interface exists for itemList
 }
