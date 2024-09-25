@@ -12,7 +12,7 @@ import { VendorService } from '../services/vendor-service.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
   @ViewChild('itemDetailsModal') itemDetailsModal!: ElementRef;
@@ -26,47 +26,56 @@ export class HomeComponent implements OnInit {
   // Variables to store selected item and vendor details
   selectedItem: any = null;
   selectedVendor: any = null;
- 
+
   constructor(
     private itemService: ItemService,
     private vendorService: VendorService
   ) {}
- 
+
   ngOnInit(): void {
     this.getItems();
     this.getVendors();
   }
- 
+
   getItems(): void {
     this.itemService.getAllItems().subscribe((data: Item[]) => {
       this.items = data;
       console.log('Fetched Items:', this.items);
       // Initialize visibility state for quantity controls
-      this.items.forEach(item => {
+      this.items.forEach((item) => {
         this.quantityControlVisible[item.itemName] = false;
       });
     });
   }
- 
+
   getVendors(): void {
     this.vendorService.getAllVendors().subscribe((data: Vendor[]) => {
       this.vendors = data;
       console.log('Fetched Vendors:', this.vendors);
     });
   }
- 
+
   increaseQuantity(item: Item) {
-    this.localQuantities[item.itemName] = (this.localQuantities[item.itemName] || 0) + 1;
-    console.log(`Quantity for ${item.itemName} increased to: ${this.localQuantities[item.itemName]}`);
+    this.localQuantities[item.itemName] =
+      (this.localQuantities[item.itemName] || 0) + 1;
+    console.log(
+      `Quantity for ${item.itemName} increased to: ${
+        this.localQuantities[item.itemName]
+      }`
+    );
   }
- 
+
   decreaseQuantity(item: Item) {
     if ((this.localQuantities[item.itemName] || 0) > 0) {
       this.localQuantities[item.itemName]--;
-      console.log(`Quantity for ${item.itemName} decreased to: ${this.localQuantities[item.itemName]}`);
+      console.log(
+        `Quantity for ${item.itemName} decreased to: ${
+          this.localQuantities[item.itemName]
+        }`
+      );
     }
   }
- 
+
   addToCart(item: Item) {
     // Set the quantity to 1 if it hasn't been set yet
     if (!this.localQuantities[item.itemName]) {
@@ -76,7 +85,7 @@ export class HomeComponent implements OnInit {
     console.log(`Added ${quantity} of ${item.itemName} to the cart.`);
     // Add your cart logic here
   }
- 
+
   // Search items or vendors based on search term
   searchItemsOrVendors(): void {
     this.itemService.getItemsOfVendorByName(this.searchTerm).subscribe({
@@ -97,7 +106,7 @@ export class HomeComponent implements OnInit {
       },
     });
   }
- 
+
   // Method to search for vendors based on the search term
   searchVendors(): void {
     this.vendorService.getVendorsByItemName(this.searchTerm).subscribe({
@@ -113,7 +122,7 @@ export class HomeComponent implements OnInit {
       },
     });
   }
- 
+
   // New method: Handle item click to show item and corresponding vendor details
   showItemDetails(item: Item): void {
     this.selectedItem = item;
@@ -132,24 +141,54 @@ export class HomeComponent implements OnInit {
     const vendor = this.vendors.find((v) => v.vendorId === vendorId);
     return vendor ? vendor.vendorName : 'UnKnown Vendor';
   }
- 
+
   getItemImageUrl(itemName: string): string {
     if (!itemName) {
       return 'assets/images/default-item-image.jpg'; // return a default image if itemName is null or undefined
     }
-    return `/assets/images/${itemName.toLowerCase().replace( / /g, '-')}.png`;
+    return `/assets/images/${itemName.toLowerCase().replace(/ /g, '-')}.png`;
   }
-  
-  
+
+  //returns the first item pic over vendor name
+
   getVendorImage(vendorName: string): string {
     const vendor = this.vendors.find((v) => v.vendorName === vendorName);
     if (vendor && vendor.itemList && vendor.itemList.length > 0) {
       // Take the first item in the vendor's item list and use its name to construct the image URL
       const firstItem = vendor.itemList[0];
-      const formattedItemName = firstItem.itemName.toLowerCase().replace(/\s+/g, '-');
+      const formattedItemName = firstItem.itemName
+        .toLowerCase()
+        .replace(/\s+/g, '-');
       return `assets/images/${formattedItemName}.png`;
     }
     // If the vendor has no items, return a default image
     return `assets/images/default.png`;
   }
+
+  /*Changes 25-09-24: Currency symbol change, 
+  title case for item card name, changed 'Vendor:' to 'Restaurant:'. And below method.*/
+
+  //To get item pic over vendor name when search term is item.
+
+  // getVendorImage(vendorName: string, itemName: string): string {
+  //   const vendor = this.vendors.find((v) => v.vendorName === vendorName);
+
+  //   if (vendor && vendor.itemList && vendor.itemList.length > 0) {
+  //     // Check if the vendor has the specific item in their item list
+  //     const item = vendor.itemList.find(
+  //       (i) => i.itemName.toLowerCase() === itemName.toLowerCase()
+  //     );
+
+  //     if (item) {
+  //       // If the vendor has the item, use its name to construct the image URL
+  //       const formattedItemName = item.itemName
+  //         .toLowerCase()
+  //         .replace(/\s+/g, '-');
+  //       return `assets/images/${formattedItemName}.png`;
+  //     }
+  //   }
+
+  //   // If the vendor does not have the item, or no items, return a default image
+  //   return `assets/images/default.png`;
+  // }
 }
