@@ -127,6 +127,10 @@ public class Items {
 	public Vendor getVendor() {
 		return vendor;
 	}
+	
+	public int getVendorId() {
+	    return this.vendor != null ? this.vendor.getVendorId() : null;
+	}
 
 	public void setVendor(Vendor vendor) {
 		this.vendor = vendor;
