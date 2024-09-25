@@ -63,10 +63,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "food-delivery-app:build:production"
+              "buildTarget": "food-delivery-app:build:production"
             },
             "development": {
-              "browserTarget": "food-delivery-app:build:development"
+              "buildTarget": "food-delivery-app:build:development"
             }
           },
           "defaultConfiguration": "development"
