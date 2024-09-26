@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { UserService } from '../services/user.service';
 import { FormsModule } from '@angular/forms';
+import { UserDTO } from '../models/userDTO';
 
 @Component({
   selector: 'app-register-form',
@@ -10,18 +11,12 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './register-form.component.css',
 })
 export class RegisterFormComponent {
-  userData = {
-    userName: '',
-    userEmail: '',
-    userPhoneNumber: '',
-    userPassword: '',
-    userAddress: '',
-  };
+  user: UserDTO = {} as UserDTO;
 
   constructor(private userService: UserService) {}
 
   register(): void {
-    this.userService.registerUser(this.userData).subscribe({
+    this.userService.registerUser(this.user).subscribe({
       next: (response) => {
         console.log('Registration successful:', response);
       },

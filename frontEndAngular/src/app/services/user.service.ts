@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { UserDTO } from '../models/userDTO';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,7 @@ export class UserService {
     return this.http.post(`${this.apiUrl}/login`, loginData);
   }
 
-  registerUser(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/save`, userData);
+  registerUser(user: UserDTO): Observable<any> {
+    return this.http.post(`${this.apiUrl}/save`, user);
   }
 }
