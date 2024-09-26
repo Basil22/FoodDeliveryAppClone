@@ -188,7 +188,8 @@ export class HomeComponent implements OnInit {
   //     }
   //   }
 
-  //   // If the vendor does not have the item, or no items, return a default image
+  //   //   // If the vendor does not have the item, or no items, return a default image
   //   return `assets/images/default.png`;
+  //   // }
   // }
 }
