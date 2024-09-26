@@ -19,4 +19,10 @@ export class UserService {
   registerUser(user: UserDTO): Observable<any> {
     return this.http.post(`${this.apiUrl}/save`, user);
   }
+
+  //Its not the controller issue. Just post method.
+
+  getUser(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/getAllUsers`);
+  }
 }

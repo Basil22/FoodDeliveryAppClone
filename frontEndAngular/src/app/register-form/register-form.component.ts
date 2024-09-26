@@ -25,4 +25,14 @@ export class RegisterFormComponent {
       },
     });
   }
+
+  //spring boot controller check method
+
+  getAllUser(): void {
+    this.userService.getUser().subscribe({
+      next: (response) => {
+        console.log(response);
+      },
+    });
+  }
 }
