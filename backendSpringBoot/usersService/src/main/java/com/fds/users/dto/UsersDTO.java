@@ -3,14 +3,20 @@ package com.fds.users.dto;
 public class UsersDTO {
 
 	private Long userId;
+
 	private String userName;
+
 	private String userEmail;
+
 	private String userPassword;
+
 	private String userPhoneNumber;
+
 	private String userAddress;
-	
+
 	public UsersDTO() {
-		
+		super();
+		// TODO Auto-generated constructor stub
 	}
 
 	public UsersDTO(Long userId, String userName, String userEmail, String userPassword, String userPhoneNumber,

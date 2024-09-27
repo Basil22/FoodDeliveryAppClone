@@ -3,10 +3,11 @@ package com.fds.users.dto;
 public class LoginRequestDto {
 
 	private String userPhoneNumber;
+
 	private String userPassword;
 
 	public LoginRequestDto() {
-
+		super();
 	}
 
 	public LoginRequestDto(String userPhoneNumber, String userPassword) {

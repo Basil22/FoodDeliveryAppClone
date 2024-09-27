@@ -1,4 +1,4 @@
-package com.fds.users.config;
+package com.fds.users;
 
 import java.util.Arrays;
 
