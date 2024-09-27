@@ -42,10 +42,10 @@ public class UsersController {
 		UsersDTO savedUser = usersService.saveUser(user);
 
 		Map<String, Object> response = new HashMap<>();
-		response.put("message", "User saved successfully");
-		response.put("data", savedUser);
+		response.put("message", "Registration successful");
+		response.put("userId", savedUser.getUserId());
 
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	// Get all users
@@ -77,7 +77,7 @@ public class UsersController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<Map<String, String>> login(@RequestBody @Valid LoginRequestDto loginRequestDto) {
+	public ResponseEntity<Map<String, Object>> login(@RequestBody @Valid LoginRequestDto loginRequestDto) {
 		// Fetch the user by phone number
 		Optional<UsersDTO> userDto = usersService.getUserByPhoneNumber(loginRequestDto.getUserPhoneNumber());
 
@@ -87,14 +87,17 @@ public class UsersController {
 
 			// Compare the provided password with the stored hashed password
 			if (passwordEncoder.matches(loginRequestDto.getUserPassword(), usersDto.getUserPassword())) {
-				return new ResponseEntity<>(Collections.singletonMap("message", "Login Successfully"), HttpStatus.OK);
+				Map<String, Object> response = new HashMap<>();
+				response.put("message", "Login Successful");
+				response.put("userId", usersDto.getUserId());
+				return new ResponseEntity<>(response, HttpStatus.OK);
+				
 			} else {
-				return new ResponseEntity<>(Collections.singletonMap("message", "Invalid password"),
-						HttpStatus.UNAUTHORIZED);
+	            return new ResponseEntity<>(Collections.singletonMap("message", "Invalid password"), HttpStatus.UNAUTHORIZED);
+
 			}
 		} else {
-			return new ResponseEntity<>(Collections.singletonMap("message", "Phone number is not registered"),
-					HttpStatus.NOT_FOUND);
+	        return new ResponseEntity<>(Collections.singletonMap("message", "Phone number is not registered"), HttpStatus.NOT_FOUND);
 		}
 	}
 

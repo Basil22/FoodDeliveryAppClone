@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.fds.users.dto.UsersDTO;
 import com.fds.users.entity.Users;
+import com.fds.users.exception.PhoneNumberAlreadyExistsException;
 import com.fds.users.exception.UserNotFoundException;
 import com.fds.users.repository.UsersRepository;
 import com.fds.users.service.UsersService;
@@ -30,6 +31,10 @@ public class UsersServiceImpl implements UsersService {
 	public UsersDTO saveUser(UsersDTO usersdto) {
 
 		// convert in to user entity to save user in to repository...
+		Optional<Users> user = usersRepository.findUserByUserPhoneNumber(usersdto.getUserPhoneNumber());
+		if(user.isPresent()) {
+			throw new PhoneNumberAlreadyExistsException("Number already registered");
+		}
 
 		Users users = modelMapper.map(usersdto, Users.class);
 		users.setUserPassword(passwordEncoder.encode(users.getUserPassword()));

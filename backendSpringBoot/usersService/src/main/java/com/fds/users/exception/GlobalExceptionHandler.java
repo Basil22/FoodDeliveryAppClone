@@ -1,5 +1,6 @@
 package com.fds.users.exception;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,9 +21,8 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(PhoneNumberAlreadyExistsException.class)
-	public ResponseEntity<String> PhoneNumberAlreadyExistsException(PhoneNumberAlreadyExistsException ex) {
-		return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
-	}
+	public ResponseEntity<Map<String, String>> PhoneNumberAlreadyExistsException(PhoneNumberAlreadyExistsException ex) {
+		return new ResponseEntity<>(Collections.singletonMap("message", ex.getMessage()), HttpStatus.CONFLICT);	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
