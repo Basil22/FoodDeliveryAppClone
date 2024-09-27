@@ -24,7 +24,7 @@ public class Users {
 	@Email(message = "Email Should be valid")
 	private String userEmail;
 
-	@NotBlank(message = "Password cannot be blank")
+	@NotBlank(message = "Password cannot be blank") //PROBLEM WITH SPRING SECURITY
 	@Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,16}$", message = "Password must be at least 8 characters long, contain letters, symbols, and numbers")
 	private String userPassword;
 

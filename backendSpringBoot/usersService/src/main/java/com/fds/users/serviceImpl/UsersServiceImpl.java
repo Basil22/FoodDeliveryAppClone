@@ -32,6 +32,7 @@ public class UsersServiceImpl implements UsersService {
 	public UsersDTO saveUser(UsersDTO usersdto) {
 		// convert in to user entity to save user in to repository...
 		Users users = modelMapper.map(usersdto, Users.class);
+		System.out.println(users.getUserPassword());
 		users.setUserPassword(passwordEncoder.encode(users.getUserPassword()));
 		Users Saveduser = usersRepository.save(users);
 
@@ -73,7 +74,7 @@ public class UsersServiceImpl implements UsersService {
 
 	@Override
 	public void deleteUser(Long userId) {
-		Users user = usersRepository.findById(userId)
+		usersRepository.findById(userId)
 				.orElseThrow(() -> new UserNotFoundException("User with the give id  " + userId + " not found"));
 
 		usersRepository.deleteById(userId);
