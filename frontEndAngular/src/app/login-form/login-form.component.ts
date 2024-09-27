@@ -19,35 +19,30 @@ export class LoginFormComponent {
 
   constructor(private userService: UserService, private router: Router) {}
   login() {
+    if (!this.loginData.userPhoneNumber || !this.loginData.userPassword) {
+      alert('Please enter both phone number and password.');
+    }
     // Ensure loginData contains phone number and password
     if (this.loginData.userPhoneNumber && this.loginData.userPassword) {
-      this.userService.loginUser(this.loginData).subscribe(
-        (response: any) => {
+      this.userService.loginUser(this.loginData).subscribe({
+        next: (response: any) => {
           console.log('Login successful!', response);
-
-          // Assuming the backend returns a token or user data upon successful login
-          // Save the token if needed (for JWT authentication)
-          if (response.token) {
-            localStorage.setItem('authToken', response.token);
-          }
-          window.alert('Login successful!');
-          setTimeout(() => {
-            this.router.navigate(['/']); // Redirect to HomeComponent
-          }, 3000); // 3 seconds
+          console.log('User ID: ', response.userId);
+          const successMessage = response.message || 'Login successful!';
+          alert(successMessage);
         },
-        (error: any) => {
-          console.error('Login failed', error);
+        error: (error: any) => {
+          console.error('Login failed:', error);
+          let errorMessage = 'Unknown error occurred';
 
-          // Handle different error statuses (e.g., 401 Unauthorized)
-          if (error.status === 401) {
-            this.errorMessage =
-              'Unauthorized. Please check your phone number and password.';
-          } else {
-            this.errorMessage =
-              error?.error?.message || 'Login failed. Please try again.';
+          if (error.error) {
+            const errorResponse = JSON.parse(error.error);
+            errorMessage = errorResponse.message || errorMessage; // Get message from error response
           }
-        }
-      );
+
+          alert(errorMessage);
+        },
+      });
     } else {
       this.errorMessage = 'Please provide both phone number and password.';
     }

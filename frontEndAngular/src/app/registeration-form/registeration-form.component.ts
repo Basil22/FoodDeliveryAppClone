@@ -32,7 +32,11 @@ export class RegisterationFormComponent {
           alert(response);
         },
         error: (error) => {
-          console.log(error);
+          let errorMessage = 'Unknown error';
+          if (error.error) {
+            errorMessage = error.error.message || errorMessage; // Get message from response
+          }
+          alert(errorMessage); // Display the error message
         },
       });
     } else {
@@ -41,6 +45,16 @@ export class RegisterationFormComponent {
   }
 
   isFormValid(): boolean {
+    if (
+      !this.userData.userName ||
+      !this.userData.userEmail ||
+      !this.userData.userPhoneNumber ||
+      !this.userData.userPassword ||
+      !this.userData.userAddress
+    ) {
+      alert('Please fill all the fields.');
+      return false;
+    }
     return true; // Adjust validation logic as necessary
   }
 }
