@@ -32,10 +32,8 @@
 
         <div class="card-body">
           <h5 class="card-title">{{ item.itemName | titlecase }}</h5>
-          <h5 class="card-text">
-            {{ getVendorName(item.vendorId) | titlecase }}
-          </h5>
-          <h6 class="card-body">{{ item.price | currency : "INR" }}</h6>
+          <h5 class="card-text">{{ getVendorName(item.vendorId) | titlecase }}</h5>
+          <h6 class="card-body">Rs. {{ item.price | currency :"INR" }}</h6>
 
           <!-- Add to Cart Button -->
           <button (click)="addToCart(item)" class="btn btn-success">Add</button>
@@ -55,23 +53,6 @@
     </div>
   </div>
 
-  <!-- Display Vendors Section -->
-  <div class="row" *ngIf="!isItemSearch">
-    <div class="col-md-4" *ngFor="let vendor of vendors">
-      <div class="card mb-4 shadow-sm text-center">
-        <div class="card-body">
-          <img
-            [src]="getVendorImage(vendor.vendorName)"
-            class="card-img-top"
-            alt="{{ vendor.vendorName }}"
-          />
-          <h5 class="card-title">{{ vendor.vendorName | titlecase }}</h5>
-          <p class="card-text">Address: {{ vendor.address }}</p>
-          <p class="card-text">Contact: {{ vendor.contactNumber }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Modal for displaying item details -->
   <div
@@ -85,7 +66,9 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="itemDetailsModalLabel">
-            {{ selectedItem?.itemName | titlecase }}
+            {{ selectedItem?.itemName 
+            | titlecase
+            }}
           </h5>
           <button
             type="button"
@@ -100,13 +83,10 @@
             class="img-fluid mb-3"
             alt="{{ selectedItem?.itemName }}"
           />
-          <p><strong>Price:</strong> Rs. {{ selectedItem?.price }}</p>
+          <p><strong>Price:</strong> Rs. {{ selectedItem?.price | currency :"INR"}}</p>
           <p><strong>Description:</strong> {{ selectedItem?.description }}</p>
           <p><strong>Ratings:</strong> {{ selectedItem?.ratings }}</p>
-          <p>
-            <strong>Restaurant:</strong>
-            {{ getVendorName(selectedItem?.vendorId) | titlecase }}
-          </p>
+          <p><strong>Vendor:</strong> {{ getVendorName(selectedItem?.vendorId) }}</p>
         </div>
         <div class="modal-footer">
           <button

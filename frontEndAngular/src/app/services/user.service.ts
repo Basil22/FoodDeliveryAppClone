@@ -4,25 +4,22 @@ import { Observable } from 'rxjs';
 import { UserDTO } from '../models/userDTO';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8080/api/users';
+  private apiUrl = 'http://localhost:8083/api/users'; 
 
   constructor(private http: HttpClient) {}
 
-  loginUser(userPhoneNumber: string, userPassword: string): Observable<any> {
-    const loginData = { userPhoneNumber, userPassword };
-    return this.http.post(`${this.apiUrl}/login`, loginData);
-  }
-
-  registerUser(user: UserDTO): Observable<any> {
+  register(user: UserDTO ): Observable<any> {
     return this.http.post(`${this.apiUrl}/save`, user);
   }
-
-  //Its not the controller issue. Just post method.
-
-  getUser(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/getAllUsers`);
+    loginUser(loginData: { userPhoneNumber: string, userPassword: string }): Observable<any> {
+    
+    //return this.http.post(`${this.apiUrl}/login`, loginData);
+   //return this.http.post('http://localhost:8083/api/users/login', loginData)
+   const headers = new HttpHeaders().set('Content-Type', 'application/json');  // Ensure proper headersreturn this.http.post(`${this.apiUrl}/login`, loginData, { headers }); }
+   return this.http.post(`${this.apiUrl}/login`, loginData, { headers });
   }
+
 }
