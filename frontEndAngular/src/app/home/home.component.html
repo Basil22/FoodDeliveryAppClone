@@ -32,8 +32,10 @@
 
         <div class="card-body">
           <h5 class="card-title">{{ item.itemName | titlecase }}</h5>
-          <h5 class="card-text">{{ getVendorName(item.vendorId) | titlecase }}</h5>
-          <h6 class="card-body">Rs. {{ item.price | currency :"INR" }}</h6>
+          <h5 class="card-text">
+            {{ getVendorName(item.vendorId) | titlecase }}
+          </h5>
+          <h6 class="card-body">{{ item.price | currency : "INR" }}</h6>
 
           <!-- Add to Cart Button -->
           <button (click)="addToCart(item)" class="btn btn-success">Add</button>
@@ -53,7 +55,6 @@
     </div>
   </div>
 
-
   <!-- Modal for displaying item details -->
   <div
     class="modal fade"
@@ -66,9 +67,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="itemDetailsModalLabel">
-            {{ selectedItem?.itemName 
-            | titlecase
-            }}
+            {{ selectedItem?.itemName | titlecase }}
           </h5>
           <button
             type="button"
@@ -83,10 +82,15 @@
             class="img-fluid mb-3"
             alt="{{ selectedItem?.itemName }}"
           />
-          <p><strong>Price:</strong> Rs. {{ selectedItem?.price | currency :"INR"}}</p>
+          <p>
+            <strong>Price:</strong> Rs.
+            {{ selectedItem?.price | currency : "INR" }}
+          </p>
           <p><strong>Description:</strong> {{ selectedItem?.description }}</p>
           <p><strong>Ratings:</strong> {{ selectedItem?.ratings }}</p>
-          <p><strong>Vendor:</strong> {{ getVendorName(selectedItem?.vendorId) }}</p>
+          <p>
+            <strong>Vendor:</strong> {{ getVendorName(selectedItem?.vendorId) }}
+          </p>
         </div>
         <div class="modal-footer">
           <button
