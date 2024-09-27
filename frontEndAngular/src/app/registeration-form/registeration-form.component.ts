@@ -9,9 +9,9 @@ import { UserService } from '../services/user.service';
 @Component({
   selector: 'app-registeration-form',
   standalone: true,
-  imports: [FormsModule,CommonModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './registeration-form.component.html',
-  styleUrl: './registeration-form.component.css'
+  styleUrl: './registeration-form.component.css',
 })
 export class RegisterationFormComponent {
   userData: UserDTO = {
@@ -19,39 +19,28 @@ export class RegisterationFormComponent {
     userEmail: '',
     userPhoneNumber: '',
     userPassword: '',
-    userAddress: ''
+    userAddress: '',
   };
-
-  
 
   constructor(private userService: UserService, private router: Router) {}
 
   register() {
     if (this.isFormValid()) {
-      this.userService.register(this.userData).subscribe(
-        (response: UserDTO) => {
+      this.userService.register(this.userData).subscribe({
+        next: (response: UserDTO) => {
           this.userData = response;
-          console.log('Registration successful!', response);
-
-          // Show popup
-          window.alert('Register successful!');
-
-          // Hide the popup and navigate after 3 seconds
-          setTimeout(() => {
-            
-            this.router.navigate(['/']);  // Redirect to HomeComponent
-          }, 3000);  // 3 seconds
+          alert(response);
         },
-        (error: any) => {
-          console.error('Registration failed', error);
-        }
-      );
+        error: (error) => {
+          console.log(error);
+        },
+      });
     } else {
       console.log('Form is invalid');
     }
   }
 
   isFormValid(): boolean {
-    return true;  // Adjust validation logic as necessary
+    return true; // Adjust validation logic as necessary
   }
 }

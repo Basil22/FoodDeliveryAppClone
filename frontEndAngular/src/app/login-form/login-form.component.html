@@ -1,38 +1,38 @@
-
 <!-- login.component.html -->
 <div class="login-wrapper">
-    <div class="login-container">
-      <h2 class="login-title">Login</h2>
-      <form 
-     (ngSubmit)="login()" >
-        <div class="form-group">
-          <label for="phoneNumber">Phone Number</label>
-          <input
-            type="text"
-            id="phoneNumber"
-            [(ngModel)]="loginData.userPhoneNumber"
-            name="phoneNumber"
-            class="form-control"
-            required
-            pattern="[0-9]{10}"
-            autocomplete="current-phoneNumber"
-            placeholder="Enter your phone number"/>
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            type="password"
-            [(ngModel)]="loginData.userPassword"
-            id="password"
-            name="password"
-            class="form-control"
-            required
-            minlength="6"
-            autocomplete="current-password"
-            placeholder="Enter your password"/>
-        </div>
-      <button class = "btn"> Login  </button>
-      <a href = "/register" class ="text-dark fw-blod">Register an Account</a>
-      </form>
-    </div>
+  <div class="login-container">
+    <h2 class="login-title">Login</h2>
+    <form (ngSubmit)="login()">
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number</label>
+        <input
+          type="text"
+          id="phoneNumber"
+          [(ngModel)]="loginData.userPhoneNumber"
+          name="phoneNumber"
+          class="form-control"
+          required
+          pattern="[0-9]{10}"
+          autocomplete="current-phoneNumber"
+          placeholder="Enter your phone number"
+        />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          [(ngModel)]="loginData.userPassword"
+          id="password"
+          name="password"
+          class="form-control"
+          required
+          minlength="6"
+          autocomplete="current-password"
+          placeholder="Enter your password"
+        />
+      </div>
+      <button class="btn">Login</button>
+      <a href="/register" class="text-dark ms-2">Register an Account</a>
+    </form>
   </div>
+</div>
