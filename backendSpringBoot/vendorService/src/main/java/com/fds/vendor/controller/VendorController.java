@@ -174,4 +174,10 @@ public class VendorController {
 		return ResponseEntity.status(HttpStatus.OK).body(itemService.viewAllItems());
 
 	}
+
+	@GetMapping("/name/{itemName}")
+	public ResponseEntity<Items> getItemByName(@PathVariable String itemName) {
+		return itemService.getItemByName(itemName).map(item -> ResponseEntity.ok(item)) // If item found, return it
+				.orElse(ResponseEntity.notFound().build()); // If not found, return 404
+	}
 }

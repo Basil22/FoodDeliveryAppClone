@@ -1,6 +1,7 @@
 package com.fds.vendor.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.fds.vendor.entity.Items;
 import com.fds.vendor.entity.Vendor;
@@ -32,4 +33,6 @@ public interface ItemService {
 	public List<Items> allAvailableItemsInVendor(String vendorName);
 	
 	public List<Items> viewAllItems();
+	
+	public Optional<Items> getItemByName(String itemName);
 }

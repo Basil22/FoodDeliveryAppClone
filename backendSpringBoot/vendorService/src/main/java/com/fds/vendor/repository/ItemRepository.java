@@ -1,6 +1,7 @@
 package com.fds.vendor.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +18,6 @@ public interface ItemRepository extends JpaRepository<Items, Integer>{
 	List<Vendor> findVendorsByItemName(@Param("itemName") String itemName);
 	
 	List<Items> findByIsAvailableTrue();
+	
+	Optional<Items> findByItemName(String itemName);
  }

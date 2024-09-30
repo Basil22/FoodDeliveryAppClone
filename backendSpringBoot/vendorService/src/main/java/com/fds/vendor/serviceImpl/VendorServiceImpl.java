@@ -331,4 +331,9 @@ public class VendorServiceImpl implements VendorService, ItemService {
 	public List<Items> viewAllItems() {
 		return itemRepo.findAll();
 	}
+	
+	@Override
+    public Optional<Items> getItemByName(String itemName) {
+        return itemRepo.findByItemName(itemName); // Call the repository method to fetch item
+    }
 }
