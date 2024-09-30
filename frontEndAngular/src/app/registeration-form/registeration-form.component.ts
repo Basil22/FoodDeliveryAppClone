@@ -27,14 +27,19 @@ export class RegisterationFormComponent {
   register() {
     if (this.isFormValid()) {
       this.userService.register(this.userData).subscribe({
-        next: (response: UserDTO) => {
-          this.userData = response;
-          alert(response);
+        next: (response: any) => {
+          // Assuming the backend returns {message: 'Registration successful', userId: <ID>}
+          const successMessage = response.message || 'Registration successful';
+          alert(successMessage); // Display the success message
+          console.log('User ID:', response.userId); // Optional: Log or store the userId
+
+          // Clear the form after successful registration
+          this.clearForm();
         },
         error: (error) => {
-          let errorMessage = 'Unknown error';
+          let errorMessage = 'Unknown error occurred';
           if (error.error) {
-            errorMessage = error.error.message || errorMessage; // Get message from response
+            errorMessage = error.error.message || errorMessage; // Get the error message from backend response
           }
           alert(errorMessage); // Display the error message
         },
@@ -42,6 +47,17 @@ export class RegisterationFormComponent {
     } else {
       console.log('Form is invalid');
     }
+  }
+
+  clearForm() {
+    // Reset the form fields
+    this.userData = {
+      userName: '',
+      userEmail: '',
+      userPhoneNumber: '',
+      userPassword: '',
+      userAddress: '',
+    };
   }
 
   isFormValid(): boolean {
