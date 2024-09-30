@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../services/user.service';
-
 import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-login-form',
   standalone: true,
@@ -18,18 +18,26 @@ export class LoginFormComponent {
   errorMessage: string | null = null;
 
   constructor(private userService: UserService, private router: Router) {}
+
   login() {
     if (!this.loginData.userPhoneNumber || !this.loginData.userPassword) {
       alert('Please enter both phone number and password.');
     }
-    // Ensure loginData contains phone number and password
+
     if (this.loginData.userPhoneNumber && this.loginData.userPassword) {
       this.userService.loginUser(this.loginData).subscribe({
         next: (response: any) => {
           console.log('Login successful!', response);
-          console.log('User ID: ', response.userId);
+
+          // Store the user ID or token in localStorage
+          localStorage.setItem('userId', response.userId); // Assuming the response contains a userId or token
+
           const successMessage = response.message || 'Login successful!';
           alert(successMessage);
+
+          setTimeout(() => {
+            this.router.navigate(['/']); // Redirect to HomeComponent
+          }, 3000);
         },
         error: (error: any) => {
           console.error('Login failed:', error);

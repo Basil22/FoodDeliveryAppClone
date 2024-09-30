@@ -16,15 +16,13 @@ import { VendorService } from '../services/vendor-service.service';
 })
 export class HomeComponent implements OnInit {
   @ViewChild('itemDetailsModal') itemDetailsModal!: ElementRef;
-  items: Item[] = []; // Array to hold the items fetched from backend
+  items: Item[] = [];
   searchTerm: string = '';
   vendors: Vendor[] = [];
-
   isItemSearch: boolean = true;
-  localQuantities: { [key: string]: number } = {}; // Object to store quantities per item
+  localQuantities: { [key: string]: number } = {};
   quantityControlVisible: { [key: string]: boolean } = {};
   selectedItemName: string | any = null;
-  // Variables to store selected item and vendor details
   selectedItem: any = null;
   selectedVendor: any = null;
 
@@ -41,7 +39,6 @@ export class HomeComponent implements OnInit {
   getItems(): void {
     this.itemService.getAllItems().subscribe((data: Item[]) => {
       this.items = data;
-
       this.items.forEach((item) => {
         this.quantityControlVisible[item.itemName] = false;
       });
@@ -51,50 +48,61 @@ export class HomeComponent implements OnInit {
   getVendors(): void {
     this.vendorService.getAllVendors().subscribe((data: Vendor[]) => {
       this.vendors = data;
-      //console.log('Fetched Vendors:', this.vendors);
     });
   }
 
-  increaseQuantity(item: Item) {
-    this.localQuantities[item.itemName] =
-      (this.localQuantities[item.itemName] || 0) + 1;
-    //console.log(`Quantity for ${item.itemName} increased to: ${this.localQuantities[item.itemName]}`);
+  // Check if the user is logged in by verifying if 'userId' exists in localStorage
+  isUserLoggedIn(): boolean {
+    return !!localStorage.getItem('userId'); // Returns true if 'userId' exists
   }
 
-  decreaseQuantity(item: Item) {
-    if ((this.localQuantities[item.itemName] || 0) > 0) {
-      this.localQuantities[item.itemName]--;
-      //console.log(`Quantity for ${item.itemName} decreased to: ${this.localQuantities[item.itemName]}`);
-    }
-  }
-
+  // Modify addToCart to check if the user is logged in
   addToCart(item: Item) {
-    // Set the quantity to 1 if it hasn't been set yet
+    if (!this.isUserLoggedIn()) {
+      alert('Please login first before adding items to the cart.');
+      return;
+    }
+
     if (!this.localQuantities[item.itemName]) {
       this.localQuantities[item.itemName] = 1;
     }
     const quantity = this.localQuantities[item.itemName] || 0;
     console.log(`Added ${quantity} of ${item.itemName} to the cart.`);
-    // Add your cart logic here
+    // Proceed with cart logic here
+  }
+
+  increaseQuantity(item: Item) {
+    this.localQuantities[item.itemName] =
+      (this.localQuantities[item.itemName] || 0) + 1;
+  }
+
+  decreaseQuantity(item: Item) {
+    if ((this.localQuantities[item.itemName] || 0) > 0) {
+      this.localQuantities[item.itemName]--;
+    }
   }
 
   searchItemsOrVendors(): void {
-    // First, attempt to search for items by name
     this.itemService.getItemDetails(this.searchTerm).subscribe({
-      // If items are found, display them
+      next: (data: any) => {
+        console.log('Data returned from API:', data); // Check if data is correct
 
-      next: (items: Item[]) => {
-        if (items.length > 0) {
-          this.items = items;
+        if (data && Array.isArray(data) && data.length > 0) {
+          // If items are found, assign them and do not call searchVendors
+          this.items = data;
           this.isItemSearch = true; // Set flag to display items
-          console.log('Items found:', items);
+          console.log('Items found:', data);
+        } else if (typeof data === 'object' && data.itemName) {
+          // If data is a single object (not an array), wrap it in an array
+          this.items = [data];
+          this.isItemSearch = true;
+          console.log('Single item found:', data);
         } else {
-          // If no items are found, search for vendors by name
+          // If no items found, proceed to search vendors
+          console.log('No items found for:', this.searchTerm);
           this.searchVendors();
         }
       },
-
-      // If the item search fails, fallback to searching vendors
       error: (err) => {
         console.error('Error fetching items:', err);
         this.searchVendors();
@@ -107,22 +115,17 @@ export class HomeComponent implements OnInit {
       next: (data: Item[]) => {
         if (data.length > 0) {
           this.items = data;
-          this.isItemSearch = true; // Display items if found
-          console.log('Items found:', data);
+          this.isItemSearch = true;
         } else {
-          // If no items found, search for vendors
-          this.searchVendors();
+          console.error('No items found for the vendor.');
         }
       },
       error: (err) => {
-        console.error('Error fetching items:', err);
-        // Fallback to search vendors if item search fails
-        this.searchVendors();
+        console.error('Error fetching items for vendor', err);
       },
     });
   }
 
-  // New method: Handle item click to show item and corresponding vendor details
   showItemDetails(item: Item): void {
     if (!item || !item.itemName) {
       console.error('Invalid item or itemName');
@@ -142,14 +145,13 @@ export class HomeComponent implements OnInit {
 
   getVendorName(vendorId: number): string {
     const vendor = this.vendors.find((v) => v.vendorId === vendorId);
-    return vendor ? vendor.vendorName : 'UnKnown Vendor';
+    return vendor ? vendor.vendorName : 'Unknown Vendor';
   }
 
   getItemImageUrl(itemName: string): string {
     if (!itemName) {
-      return 'assets/images/default-item-image.jpg'; // return a default image if itemName is null or undefined
-    } else {
-      return `/assets/images/${itemName.toLowerCase().replace(/ /g, '-')}.png`;
+      return 'assets/images/default-item-image.jpg';
     }
+    return `/assets/images/${itemName.toLowerCase().replace(/ /g, '-')}.png`;
   }
 }
