@@ -89,7 +89,8 @@
           <p><strong>Description:</strong> {{ selectedItem?.description }}</p>
           <p><strong>Ratings:</strong> {{ selectedItem?.ratings }}</p>
           <p>
-            <strong>Vendor:</strong> {{ getVendorName(selectedItem?.vendorId) }}
+            <strong>Vendor:</strong>
+            {{ getVendorName(selectedItem?.vendorId) | titlecase }}
           </p>
         </div>
         <div class="modal-footer">
