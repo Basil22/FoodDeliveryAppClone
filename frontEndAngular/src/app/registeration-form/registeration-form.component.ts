@@ -36,8 +36,8 @@ export class RegisterationFormComponent {
           // Clear the form after successful registration
           this.clearForm();
           setTimeout(() => {
-            this.router.navigate(['/']); // Redirect to HomeComponent
-          }, 3000);
+            this.router.navigate(['/']);  // Redirect to HomeComponent
+          }, 3000);  
         },
         error: (error) => {
           let errorMessage = 'Unknown error occurred';
@@ -74,6 +74,6 @@ export class RegisterationFormComponent {
       alert('Please fill all the fields.');
       return false;
     }
-    return true;
+    return true; // Adjust validation logic as necessary
   }
 }

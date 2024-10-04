@@ -16,9 +16,40 @@
       </div>
     </div>
   </div>
+  <div class="row" *ngIf="!selectedVendor">
+    <div class="col-md-4" *ngFor="let restaurant of vendors">
+      <div
+        class="card mb-4 shadow-sm text-center"
+        (click)="selectVendor(restaurant)"
+      >
+        <!-- Restaurant Image -->
+        <img
+          [src]="getRestaurantImageUrl(restaurant.vendorName)"
+          class="card-img-top"
+          alt="{{ restaurant.vendorName }}"
+        />
+
+        <div class="card-body">
+          <h5 class="card-title">{{ restaurant.vendorName | titlecase }}</h5>
+          <p>{{ restaurant.address }}</p>
+          <p>
+            Status:
+            <span
+              [ngClass]="{
+                'text-success': restaurant.open,
+                'text-danger': !restaurant.open
+              }"
+            >
+              {{ restaurant.open ? "Open" : "Closed" }}
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Display Items Section -->
-  <div class="row" *ngIf="isItemSearch">
+  <div class="row" *ngIf="selectedVendor">
     <div class="col-md-4" *ngFor="let item of items">
       <div class="card mb-4 shadow-sm text-center">
         <img
@@ -89,8 +120,7 @@
           <p><strong>Description:</strong> {{ selectedItem?.description }}</p>
           <p><strong>Ratings:</strong> {{ selectedItem?.ratings }}</p>
           <p>
-            <strong>Vendor:</strong>
-            {{ getVendorName(selectedItem?.vendorId) | titlecase }}
+            <strong>Vendor:</strong> {{ getVendorName(selectedItem?.vendorId) }}
           </p>
         </div>
         <div class="modal-footer">

@@ -6,6 +6,7 @@ import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/
 import { ItemService } from './services/item.service';
 import { FormsModule } from '@angular/forms';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'; 
+import { FilterItemsByVendorPipe } from './filter-items-by-vendor.pipe';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
@@ -17,6 +18,7 @@ export const appConfig: ApplicationConfig = {
     FormsModule,
     HttpClientModule, // Add HttpClientModule here
   
-    provideHttpClient(withFetch()), provideAnimationsAsync() // Use this instead of HttpClientModule
+    provideHttpClient(withFetch()), provideAnimationsAsync(),
+    FilterItemsByVendorPipe // Use this instead of HttpClientModule
   ],
 };
