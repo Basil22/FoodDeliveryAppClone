@@ -3,7 +3,9 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Item } from '../models/item';
 import { Vendor } from '../models/vendor';
+import { CartService } from '../services/cart.service';
 import { ItemService } from '../services/item.service';
+import { UserService } from '../services/user.service';
 import { VendorService } from '../services/vendor-service.service';
 
 @Component({
@@ -28,6 +30,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private itemService: ItemService,
     private vendorService: VendorService,
+    private userService: UserService,
+    private cartService: CartService
  
   ) {}
  
@@ -52,25 +56,48 @@ export class HomeComponent implements OnInit {
   }
  
    // Check if the user is logged in by verifying if 'userId' exists in localStorage
-   isUserLoggedIn(): boolean {
-    return !!localStorage.getItem('userId'); // Returns true if 'userId' exists
+   getUserId(): string | null {
+    return localStorage.getItem('userId'); // Returns true if 'userId' exists
   }
  
   // Modify addToCart to check if the user is logged in
-  addToCart(item: Item) {
-    if (!this.isUserLoggedIn()) {
-      alert('Please login first before adding items to the cart.');
-      return;
-    }
-   
-    if (!this.localQuantities[item.itemName]) {
-      this.localQuantities[item.itemName] = 1;
-    }
-    const quantity = this.localQuantities[item.itemName] || 0;
-    console.log(`Added ${quantity} of ${item.itemName} to the cart.`);
-    // Proceed with cart logic here
+
+
+addToCart(item: Item): void {
+  const userIdString = this.getUserId(); // Get userId as string
+  const userIdtoNumber = userIdString ? Number(userIdString) : NaN; // Convert to number
+  console.log('Retrieved userId from localStorage:', userIdString); // Debug log
+  if (isNaN(userIdtoNumber)) { // Check if userId is NaN
+    alert('Please log in to add items to the cart.');
+    return;
   }
- 
+  // Check if the quantity is already set, otherwise default to 1
+  if (!this.localQuantities[item.itemName]) {
+    this.localQuantities[item.itemName] = 1;
+  }
+   
+  const quantity = this.localQuantities[item.itemName]; // Get current quantity
+  const itemName = item.itemName; // Assuming the item object has a name property
+  const vendorId = Number(item.vendorId); // Get vendorId from item.vendorId; // Assuming the item object has a vendorId property
+
+  const cartPayload = {
+     userId: userIdtoNumber, // Pass the userId from the logged-in user
+    itemQuantities: { [itemName]: quantity }, // Create a map where itemName is key, quantity is value
+    vendorId: vendorId // Pass the vendorId
+  };
+
+  // Call the CartService to add the item to the cart
+  this.cartService.addItemToCart(cartPayload).subscribe({
+    next: (response) => {
+      console.log('Item added to cart successfully:', response);
+    },
+    error: (error) => {
+      console.error('Error adding item to cart:', error);
+    }
+  });
+}
+
+
   increaseQuantity(item: Item) {
     this.localQuantities[item.itemName] = (this.localQuantities[item.itemName] || 0) + 1;
   }

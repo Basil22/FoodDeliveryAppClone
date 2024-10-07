@@ -26,18 +26,24 @@ export class LoginFormComponent {
  
     if (this.loginData.userPhoneNumber && this.loginData.userPassword) {
       this.userService.loginUser(this.loginData).subscribe({
-        next: (response: any) => {
+        next: (response) => {
           console.log('Login successful!', response);
+         // console.log('Full Response:', JSON.stringify(response));
          
           // Store the user ID or token in localStorage
-          localStorage.setItem('userId', response.userId); // Assuming the response contains a userId or token
-         
-          const successMessage = response.message || 'Login successful!';
+          if (response && response.userId !== undefined) {
+            localStorage.setItem('userId', response.userId.toString());
+            const successMessage = response.message || 'Login successful!';
           alert(successMessage);
  
           setTimeout(() => {
             this.router.navigate(['/']);  // Redirect to HomeComponent
-          }, 3000);  
+          }, 3000);   // Store userId as a string
+          } else {
+            console.error('UserId not found in response:', response);
+          }
+         
+          
         },
         error: (error: any) => {
           console.error('Login failed:', error);

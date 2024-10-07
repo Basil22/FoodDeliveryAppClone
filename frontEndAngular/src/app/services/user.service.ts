@@ -24,16 +24,19 @@ export class UserService {
   loginUser(loginData: {
     userPhoneNumber: string;
     userPassword: string;
-  }): Observable<any> {
-    const headers = new HttpHeaders().set('Content-Type', 'application/json'); // Ensure proper headersreturn this.http.post(`${this.apiUrl}/login`, loginData, { headers }); }
+}): Observable<{ message: string; userId: number }> {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json'); // Ensure proper headers
     return this.http.post<{ message: string; userId: number }>(
-      `${this.apiUrl}/login`,
-      loginData,
-      {
-        headers,
-        responseType: 'text' as 'json',
-      }).pipe(catchError((error) => {
-        return throwError(() => error);
-      }));
-  }
+        `${this.apiUrl}/login`,
+        loginData,
+        { headers }
+    ).pipe(
+        catchError((error) => {
+            return throwError(() => error);
+        })
+    );
+}
+
+  
+  
 }

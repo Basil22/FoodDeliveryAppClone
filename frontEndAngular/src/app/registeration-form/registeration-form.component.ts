@@ -15,6 +15,7 @@ import { UserService } from '../services/user.service';
 })
 export class RegisterationFormComponent {
   userData: UserDTO = {
+    userId: 0,
     userName: '',
     userEmail: '',
     userPhoneNumber: '',
@@ -55,6 +56,7 @@ export class RegisterationFormComponent {
   clearForm() {
     // Reset the form fields
     this.userData = {
+      userId: 0,
       userName: '',
       userEmail: '',
       userPhoneNumber: '',
