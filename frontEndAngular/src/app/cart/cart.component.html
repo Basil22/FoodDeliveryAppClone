@@ -1,0 +1,45 @@
+<div class="container cart-container">
+    <h2 class="text-center my-4">Your Cart</h2>
+  
+    <div *ngIf="cart" class="border rounded p-4 shadow-sm">
+      <h3 class="text-orange">Items:</h3>
+      <ul class="list-group mb-4">
+        <li *ngFor="let item of cart.itemQuantities | keyvalue" class="list-group-item d-flex justify-content-between align-items-center">
+          {{ item.key }}: {{ item.value }} pcs
+  
+          <!-- Increment/Decrement Buttons -->
+          <div class="quantity-controls">
+            <button (click)="decreaseQuantity(item.key)">-</button>
+            <button (click)="increaseQuantity(item.key)">+</button>
+          </div>
+        </li>
+      </ul>
+  
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <p><strong>Total Price:</strong> {{ cart.totalPrice | currency }}</p>
+          <p><strong>GST Included Price:</strong> {{ cart.gstIncludedPrice | currency }}</p>
+          <p><strong>Delivery Charges:</strong> {{ cart.deliveryCharges | currency }}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Payable Amount:</strong> {{ cart.payableAmount | currency }}</p>
+          <p><strong>Discounted Price:</strong> {{ cart.discountedPrice | currency }}</p>
+        </div>
+      </div>
+  
+      <h3 class="text-orange">Apply Coupon:</h3>
+      <div class="input-group mb-3">
+        <select #couponSelect class="form-select">
+          <option *ngFor="let coupon of couponTypes" [value]="coupon.code">
+            {{ coupon.code }} - {{ coupon.discountValue }}%
+          </option>
+        </select>
+        <button class="btn btn-success" (click)="applyCoupon(couponSelect.value)">Apply</button>
+      </div>
+    </div>
+  
+    <div *ngIf="!cart" class="alert alert-warning text-center">
+      Your cart is empty.
+    </div>
+  </div>
+  
