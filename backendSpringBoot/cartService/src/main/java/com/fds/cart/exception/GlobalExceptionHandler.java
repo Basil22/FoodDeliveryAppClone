@@ -32,4 +32,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleGeneralException(Exception ex) {
         return new ResponseEntity<>("An error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    
+    public ResponseEntity<String> handleCartAlreadyExistsException(Exception ex){
+    	return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);	
+    }
 }

@@ -1,15 +1,5 @@
 package com.fds.cart.service;
 
-import com.fds.cart.dto.ItemsDTO;
-import com.fds.cart.dto.UserDTO;
-import com.fds.cart.dto.VendorDTO;
-import com.fds.cart.entity.Cart;
-import com.fds.cart.entity.CouponType;
-import com.fds.cart.exception.CartNotFoundException;
-import com.fds.cart.exception.ItemNotFoundException;
-import com.fds.cart.exception.UserNotFoundException;
-import com.fds.cart.repository.CartRepository;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +12,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import com.fds.cart.dto.ItemsDTO;
+import com.fds.cart.dto.UserDTO;
+import com.fds.cart.dto.VendorDTO;
+import com.fds.cart.entity.Cart;
+import com.fds.cart.entity.CouponType;
+import com.fds.cart.exception.CartAlreadyExistsException;
+import com.fds.cart.exception.CartNotFoundException;
+import com.fds.cart.exception.ItemNotFoundException;
+import com.fds.cart.exception.UserNotFoundException;
+import com.fds.cart.repository.CartRepository;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -54,7 +55,30 @@ public class CartServiceImpl implements CartService {
 
 			// Fetch distance
 			Integer distance = getDistanceFromVendor(userId, vendorId);
-			// Integer distance =4;
+
+			// Check if cart already exists for the user
+			Optional<Cart> existingCartOpt = cartRepository.findByUserId(userId);
+			Cart cart;
+			if (existingCartOpt.isPresent()) {
+				// Update existing cart
+				cart = existingCartOpt.get();
+
+				// Check if vendor matches the current vendor in the cart
+				if (!cart.getVendorName().equals(vendorDTO.getVendorName())) {
+					throw new RuntimeException("Cannot add items from different vendors in the same cart.");
+				}
+
+				// Update the item quantities in the cart
+				for (Map.Entry<String, Integer> entry : itemQuantities.entrySet()) {
+					cart.getItemQuantities().merge(entry.getKey(), entry.getValue(), Integer::sum);
+				}
+			} else {
+				// Create a new cart if it doesn't exist
+				cart = new Cart();
+				cart.setUserId(userId);
+				cart.setItemQuantities(itemQuantities);
+				cart.setVendorName(vendorDTO.getVendorName());
+			}
 
 			double totalPrice = 0.0;
 			Map<String, ItemsDTO> itemsDTOMap = new HashMap<>();
@@ -76,7 +100,7 @@ public class CartServiceImpl implements CartService {
 			}
 
 			// Calculate total price and verify items
-			for (Map.Entry<String, Integer> entry : itemQuantities.entrySet()) {
+			for (Map.Entry<String, Integer> entry : cart.getItemQuantities().entrySet()) {
 				String itemName = entry.getKey();
 				int quantity = entry.getValue();
 
@@ -88,31 +112,11 @@ public class CartServiceImpl implements CartService {
 				totalPrice += itemDTO.getPrice() * quantity;
 			}
 
-			// Check if cart already exists for the user
-			Optional<Cart> existingCart = cartRepository.findByUserId(userId);
-			if (existingCart.isPresent()) {
-				// Update the existing cart
-				Cart cart = existingCart.get();
-				Map<String, Integer> existingItemQuantities = cart.getItemQuantities();
+			cart.setTotalPrice(totalPrice);
+			cart.updateCharges(distance.doubleValue()); // Set delivery charges and payable amount
 
-				// Update the quantities or add new items
-				for (Map.Entry<String, Integer> entry : itemQuantities.entrySet()) {
-					existingItemQuantities.merge(entry.getKey(), entry.getValue(), Integer::sum);
-				}
-				cart.setItemQuantities(existingItemQuantities);
-				cart.setTotalPrice(cart.getTotalPrice() + totalPrice); // Update total price
-				cart.updateCharges(distance.doubleValue()); // Update delivery charges and payable amount
-				return cartRepository.save(cart);
-			} else {
-				// Create and save a new cart
-				Cart cart = new Cart();
-				cart.setUserId(userId);
-				cart.setItemQuantities(itemQuantities);
-				cart.setTotalPrice(totalPrice);
-				cart.setVendorName(vendorDTO.getVendorName());
-				cart.updateCharges(distance.doubleValue()); // Set delivery charges and payable amount
-				return cartRepository.save(cart);
-			}
+			// Save and return the updated/created cart
+			return cartRepository.save(cart);
 
 		} catch (HttpClientErrorException e) {
 			throw new RuntimeException("Service unavailable or error fetching details: " + e.getMessage(), e);
@@ -135,26 +139,20 @@ public class CartServiceImpl implements CartService {
 			if (vendorDTO == null) {
 				throw new RuntimeException("Vendor not found with ID: " + vendorId);
 			}
-			Integer distance = getDistanceFromVendor(userId, vendorId);
 
+			Integer distance = getDistanceFromVendor(userId, vendorId);
 			double totalPrice = 0.0;
 			Map<String, ItemsDTO> itemsDTOMap = new HashMap<>();
 
 			// Fetch all items for the vendor
-			String vendorItemsUrl = ITEM_SERVICE_URL + "/vendor/" + vendorId + "/items/category" + categoryName;// {vendorId}/items/category/{itemCategory}
+			String vendorItemsUrl = ITEM_SERVICE_URL + "/vendor/" + vendorId + "/items/category/" + categoryName;
 			ResponseEntity<List<ItemsDTO>> response = restTemplate.exchange(vendorItemsUrl, HttpMethod.GET, null,
 					new ParameterizedTypeReference<List<ItemsDTO>>() {
 					});
 
 			List<ItemsDTO> itemsList = response.getBody();
-
 			if (itemsList == null || itemsList.isEmpty()) {
 				throw new RuntimeException("No items found for vendor with ID: " + vendorId);
-			}
-
-			// Log fetched items and their categories
-			for (ItemsDTO item : itemsList) {
-				System.out.println("Item Name: " + item.getItemName() + ", Category: " + item.getItemCategory());
 			}
 
 			// Filter items by category
@@ -168,37 +166,40 @@ public class CartServiceImpl implements CartService {
 				throw new RuntimeException("No items found in category: " + categoryName);
 			}
 
-			// Calculate total price and verify items based on the provided itemQuantities
+			// Calculate total price
 			for (Map.Entry<String, Integer> entry : itemQuantities.entrySet()) {
 				String itemName = entry.getKey();
 				int quantity = entry.getValue();
-
 				ItemsDTO itemDTO = itemsDTOMap.get(itemName);
-
 				if (itemDTO == null) {
 					throw new ItemNotFoundException(
 							"Item not found with name: " + itemName + " in category: " + categoryName);
 				}
-
 				totalPrice += itemDTO.getPrice() * quantity;
 			}
 
-			// Create and save the cart with vendor name, total price, and category details
-			Cart cart = new Cart();
-			cart.setUserId(userId);
-			cart.setItemQuantities(itemQuantities); // Use itemName as key in itemQuantities
-			cart.setTotalPrice(totalPrice);
-
-			cart.setVendorName(vendorDTO.getVendorName());
-			cart.updateCharges(distance.doubleValue());
-			return cartRepository.save(cart);
+			// Check if a cart already exists for the user
+			Optional<Cart> existingCart = cartRepository.findByUserId(userId);
+			if (existingCart.isPresent()) {
+				// If a cart exists, prevent adding new items and throw an exception
+				throw new CartAlreadyExistsException("User already has a cart. You cannot add more items.");
+			} else {
+				// Create and save a new cart
+				Cart cart = new Cart();
+				cart.setUserId(userId);
+				cart.setItemQuantities(itemQuantities); // Use itemName as key in itemQuantities
+				cart.setTotalPrice(totalPrice);
+				cart.setVendorName(vendorDTO.getVendorName());
+				cart.updateCharges(distance.doubleValue());
+				return cartRepository.save(cart);
+			}
 
 		} catch (HttpClientErrorException e) {
 			throw new RuntimeException("Service unavailable or error fetching details: " + e.getMessage(), e);
 		}
 	}
 
-	public Cart updateCart(Long cartId, Long userId, Map<String, Integer> itemQuantities, Long vendorId) {
+	public Cart updateCart(Long cartId, Long userId, Map<String, Integer> newItemQuantities, Long vendorId) {
 		try {
 			// Fetch user details
 			String userUrl = USER_SERVICE_URL + "/" + userId;
@@ -213,9 +214,9 @@ public class CartServiceImpl implements CartService {
 			if (vendorDTO == null) {
 				throw new RuntimeException("Vendor not found with ID: " + vendorId);
 			}
+
+			// Fetch distance
 			Integer distance = getDistanceFromVendor(userId, vendorId);
-			double totalPrice = 0.0;
-			Map<String, ItemsDTO> itemsDTOMap = new HashMap<>();
 
 			// Fetch all items for the vendor
 			String vendorItemsUrl = ITEM_SERVICE_URL + "/vendor/" + vendorId + "/items";
@@ -224,12 +225,12 @@ public class CartServiceImpl implements CartService {
 					});
 
 			List<ItemsDTO> itemsList = response.getBody();
-
 			if (itemsList == null) {
 				throw new RuntimeException("No items found for vendor with ID: " + vendorId);
 			}
 
 			// Create a map for quick lookup of items by itemName
+			Map<String, ItemsDTO> itemsDTOMap = new HashMap<>();
 			for (ItemsDTO item : itemsList) {
 				itemsDTOMap.put(item.getItemName(), item); // Use itemName as key
 			}
@@ -238,31 +239,39 @@ public class CartServiceImpl implements CartService {
 			Cart cart = cartRepository.findById(cartId)
 					.orElseThrow(() -> new RuntimeException("Cart not found with ID: " + cartId));
 
-			// Update item quantities and calculate total price
-			for (Map.Entry<String, Integer> entry : itemQuantities.entrySet()) {
+			// Get existing items from the cart
+			Map<String, Integer> existingItemQuantities = cart.getItemQuantities();
+
+			// Calculate new total price and merge item quantities
+			double totalPrice = cart.getTotalPrice();
+			for (Map.Entry<String, Integer> entry : newItemQuantities.entrySet()) {
 				String itemName = entry.getKey();
-				int quantity = entry.getValue();
+				int newQuantity = entry.getValue();
 
 				ItemsDTO itemDTO = itemsDTOMap.get(itemName);
-
 				if (itemDTO == null) {
 					throw new ItemNotFoundException("Item not found with name: " + itemName);
 				}
 
-				totalPrice += itemDTO.getPrice() * quantity;
+				// Update the existing quantity or add a new item
+				existingItemQuantities.merge(itemName, newQuantity, Integer::sum);
+
+				// Update total price
+				totalPrice += itemDTO.getPrice() * newQuantity;
 			}
 
 			// Update cart details
-			cart.setItemQuantities(itemQuantities); // itemQuantities now maps itemName to quantity
-			cart.setTotalPrice(totalPrice);
-			cart.setVendorName(vendorDTO.getVendorName());
-			cart.updateCharges(distance.doubleValue());
+			cart.setItemQuantities(existingItemQuantities); // Save the merged item quantities
+			cart.setTotalPrice(totalPrice); // Update total price
+			cart.setVendorName(vendorDTO.getVendorName()); // Update vendor name if needed
+			cart.updateCharges(distance.doubleValue()); // Update delivery charges and payable amount
 			return cartRepository.save(cart);
 
 		} catch (HttpClientErrorException e) {
 			throw new RuntimeException("Service unavailable or error fetching details: " + e.getMessage(), e);
 		}
 	}
+
 //    public Cart updateCartByItems(Long cartId, Map<String, Integer> itemQuantities) {
 //        try {
 //            // Fetch existing cart
@@ -395,7 +404,7 @@ public class CartServiceImpl implements CartService {
 	}
 
 	public Integer getDistanceFromVendor(Long userId, Long vendorId) {
-		String distanceUrl = "http://localhost:8081/api/vendor/user/" + userId + vendorId;
+		String distanceUrl = "http://localhost:8081/api/vendor/user/distance/" + userId + "/" + vendorId;
 		try {
 			return restTemplate.getForObject(distanceUrl, Integer.class); // Assuming distance is returned as an Integer
 		} catch (HttpClientErrorException e) {
