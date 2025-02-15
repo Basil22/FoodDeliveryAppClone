@@ -18,6 +18,7 @@ import { VendorService } from '../services/vendor-service.service';
 })
 export class HomeComponent implements OnInit {
   @ViewChild('itemDetailsModal') itemDetailsModal!: ElementRef;
+  @ViewChild('vendorSection') vendorSection!: ElementRef;
   items: Item[] = [];
   searchTerm: string = '';
   vendors: Vendor[] = [];
@@ -27,6 +28,7 @@ export class HomeComponent implements OnInit {
   selectedItemName: string | any = null;
   selectedItem: any = null;
   selectedVendor: any = null;
+  router: any;
 
   constructor(
     private itemService: ItemService,
@@ -52,6 +54,14 @@ export class HomeComponent implements OnInit {
   getVendors(): void {
     this.vendorService.getAllVendors().subscribe((data: Vendor[]) => {
       this.vendors = data;
+
+      setTimeout(() => {
+        if (this.vendorSection) {
+          this.vendorSection.nativeElement.scrollIntoView({
+            behavior: 'smooth',
+          });
+        }
+      }, 300);
     });
   }
 
@@ -135,62 +145,6 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  searchItemsOrVendors(): void {
-    if (!this.searchTerm) {
-      this.items = [];
-      this.vendors = [];
-      return;
-    }
-
-    this.itemService.getItemDetails(this.searchTerm).subscribe({
-      next: (data: any) => {
-        console.log('Data returned from API:', data); // Check if data is correct
-
-        if (data && Array.isArray(data) && data.length > 0) {
-          // If items are found, assign them and do not call searchVendors
-          this.items = data;
-          this.isVendorSearch = false; // Set flag to display items
-          console.log('Items found:', data);
-        } else if (typeof data === 'object' && data.itemName) {
-          // If data is a single object (not an array), wrap it in an array
-          this.items = [data];
-          this.isVendorSearch = false;
-          console.log('Single item found:', data);
-        } else {
-          // If no items found, proceed to search vendors
-          console.log('No items found for:', this.searchTerm);
-          this.searchVendors();
-        }
-      },
-      error: (err) => {
-        console.error('Error fetching items:', err);
-        this.searchVendors();
-      },
-    });
-  }
-
-  searchVendors(): void {
-    this.itemService.getItemsOfVendorByName(this.searchTerm).subscribe({
-      next: (data: Item[]) => {
-        console.log('Data returned from API:', data);
-        if (data.length > 0) {
-          this.items = data;
-          this.isVendorSearch = false;
-          this.selectedVendor = { vendorName: this.searchTerm } as Vendor;
-        } else {
-          console.error('No items found for the vendor.');
-          this.items = [];
-          this.selectedVendor = null;
-        }
-      },
-      error: (err) => {
-        console.error('Error fetching items for vendor', err);
-        this.items = []; // Clear items on error
-        this.selectedVendor = null;
-      },
-    });
-  }
-
   showItemDetails(item: Item): void {
     if (!item || !item.itemName) {
       console.error('Invalid item or itemName');
@@ -232,15 +186,5 @@ export class HomeComponent implements OnInit {
   }
   getRestaurantImageUrl(vendorName: string): string {
     return `/assets/images/${vendorName.toLowerCase().replace(/ /g, '-')}.png`;
-  }
-
-  selectVendor(vendor: Vendor): void {
-    this.selectedVendor = vendor;
-    this.isVendorSearch = false;
-    this.vendorService
-      .getItemsOfVendor(vendor.vendorId)
-      .subscribe((data: Item[]) => {
-        this.items = data; // Update items to show items from the selected vendor
-      });
   }
 }

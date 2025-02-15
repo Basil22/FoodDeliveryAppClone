@@ -1,37 +1,60 @@
 /* Customize the navbar brand */
 .navbar-brand {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #d66310;
-  }
-  
-  /* Register and Login links */
-  .nav-link {
+  font-size: 2rem;
+  font-family: "Raleway";
+  font-weight: 700;
+  color: #e24141;
+  padding-left: 10px;
+}
+
+.nav-item {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* Register and Login links */
+.nav-link {
+  font-size: 1rem;
+  font-family: "Raleway";
+  color: #000000;
+  font-weight: 400;
+}
+
+.nav-link:hover {
+  color: #e24141;
+}
+
+/* Navbar styling */
+.navbar {
+  background-color: #ffffff;
+  padding: 1px 1px;
+}
+
+.input-group {
+  display: flex; /* Use flexbox to align items in one line */
+  justify-content: center;
+}
+
+.input-group input {
+  border-right: none; /* Remove border on the right side of the input */
+}
+
+.input-group .btn {
+  border-left: none; /* Remove border on the left side of the button */
+}
+
+.custom-search-input {
+  border-radius: 15px;
+  font-size: small;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .navbar-brand {
     font-size: 1.2rem;
-    color: #d66310;
-    font-weight: bold;
-    transition: color 0.3s ease;
   }
-  
-  .nav-link:hover {
-    color: #0056b3;
+
+  .nav-link {
+    font-size: 1rem;
   }
-  
-  /* Navbar styling */
-  .navbar {
-    background-color: #f8f9fa;
-    padding: 10px 20px;
-    border-bottom: 2px solid #e3e3e3;
-  }
-  
-  /* Responsive design for smaller screens */
-  @media (max-width: 768px) {
-    .navbar-brand {
-      font-size: 1.2rem;
-    }
-  
-    .nav-link {
-      font-size: 1rem;
-    }
-  }
-  
+}

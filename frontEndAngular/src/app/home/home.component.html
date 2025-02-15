@@ -1,60 +1,109 @@
-<div class="container mt-5">
-  <div class="row">
-    <div class="col-md-12 text-center">
-      <div class="input-group mb-3">
-        <input
-          type="text"
-          [(ngModel)]="searchTerm"
-          placeholder="Enter restaurant name or item name"
-          class="form-control"
-          id="searchInput"
-          (keydown.enter)="searchItemsOrVendors()"
-        />
-        <button (click)="searchItemsOrVendors()" class="btn btn-primary">
-          Search
-        </button>
+<div class="container mt-4">
+  <div class="row align-items-center">
+    <!-- Left Side: Text Content -->
+    <div class="col-md-6 text-start">
+      <h5 class="text-dark fw-normal">Don't starve.</h5>
+      <h1 class="text-danger fw-bold display-1">Order Food</h1>
+      <h1 class="text-danger fw-bold display-1">Now.</h1>
+      <button
+        class="btn btn-danger mt-4 px-4 custom-btn"
+        (click)="getVendors()"
+      >
+        Explore here!
+      </button>
+    </div>
+
+    <!-- Right Side: Food Grid -->
+    <div class="col-md-6">
+      <div class="row g-5">
+        <div class="col-6">
+          <div class="food-card">
+            <img
+              src="assets/images/vada.png"
+              class="img-fluid rounded"
+              alt="Vada"
+            />
+            <div class="overlay">
+              <h4>Vada</h4>
+              <p>Sri Udupi Park</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="food-card">
+            <img
+              src="assets/images/garlic-bread.png"
+              class="img-fluid rounded"
+              alt="Garlic Bread"
+            />
+            <div class="overlay">
+              <h4>Garlic Bread</h4>
+              <p>Dominos Pizza</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="food-card">
+            <img
+              src="assets/images/pepperoni-pizza.png"
+              class="img-fluid rounded"
+              alt="Pepperoni"
+            />
+            <div class="overlay">
+              <h4>Pepperoni</h4>
+              <p>Oven Story</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="food-card">
+            <img
+              src="assets/images/chicken-fried-rice.png"
+              class="img-fluid rounded"
+              alt="Chicken Fried Rice"
+            />
+            <div class="overlay">
+              <h4>Chicken Fried Rice</h4>
+              <p>Chinese Wok</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+    <!-- End of Food Grid -->
   </div>
+  <!-- End of Row -->
 
-  <!-- Display Vendors Section -->
+  <div>
+    <div *ngFor="let vendor of vendors">
+      <!-- Restaurant Image (Left Side) -->
+      <img
+        [src]="getRestaurantImageUrl(vendor.vendorName)"
+        class="img-fluid"
+        alt="{{ vendor.vendorName }}"
+        style="
+          width: 150px;
+          height: auto;
+          object-fit: cover;
+          margin-right: 20px;
+        "
+      />
 
-  <!-- Vendor list, shown only when no item search is active and no vendor is selected -->
-  <div class="row" *ngIf="isVendorSearch && !selectedVendor">
-    <div class="col-md-12" *ngFor="let vendor of vendors">
-      <div
-        class="card mb-4 shadow-sm d-flex flex-row align-items-center p-3"
-        (click)="selectVendor(vendor)"
-      >
-        <!-- Restaurant Image (Left Side) -->
-        <img
-          [src]="getRestaurantImageUrl(vendor.vendorName)"
-          class="img-fluid"
-          alt="{{ vendor.vendorName }}"
-          style="
-            width: 150px;
-            height: auto;
-            object-fit: cover;
-            margin-right: 20px;
-          "
-        />
-
-        <!-- Restaurant Details (Right Side) -->
-        <div class="card-body text-left">
-          <h5 class="card-title">{{ vendor.vendorName | titlecase }}</h5>
-          <p>{{ vendor.address }}</p>
-          <p>
-            Status:
-            <span
-              [ngClass]="{
-                'text-success': vendor.open,
-                'text-danger': !vendor.open
-              }"
-            >
-              {{ vendor.open ? "Open" : "Closed" }}
-            </span>
-          </p>
-        </div>
+      <!-- Restaurant Details (Right Side) -->
+      <div class="card-body text-left">
+        <h5 class="card-title">{{ vendor.vendorName | titlecase }}</h5>
+        <p>{{ vendor.address }}</p>
+        <p>
+          Status:
+          <span
+            [ngClass]="{
+              'text-success': vendor.open,
+              'text-danger': !vendor.open
+            }"
+          >
+            {{ vendor.open ? "Open" : "Closed" }}
+          </span>
+        </p>
       </div>
     </div>
   </div>
@@ -95,59 +144,61 @@
       </div>
     </div>
   </div>
-
-  <!-- Modal for displaying item details -->
-  <div
-    class="modal fade"
-    id="itemDetailsModal"
-    tabindex="-1"
-    aria-labelledby="itemDetailsModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="itemDetailsModalLabel">
-            {{ selectedItem?.itemName | titlecase }}
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <img
-            [src]="getItemImageUrl(selectedItem?.itemName)"
-            class="img-fluid mb-3"
-            alt="{{ selectedItem?.itemName }}"
-          />
-          <p>
-            <strong>Price:</strong> Rs.
-            {{ selectedItem?.price | currency : "INR" }}
-          </p>
-          <p><strong>Description:</strong> {{ selectedItem?.description }}</p>
-          <p><strong>Ratings:</strong> {{ selectedItem?.ratings }}</p>
-          <p>
-            <strong>Vendor:</strong> {{ getVendorName(selectedItem?.vendorId) }}
-          </p>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Close
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            (click)="addToCart(selectedItem)"
-          >
-            Add to Cart
-          </button>
+  <div>
+    <!-- Modal for displaying item details -->
+    <div
+      class="modal fade"
+      id="itemDetailsModal"
+      tabindex="-1"
+      aria-labelledby="itemDetailsModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="itemDetailsModalLabel">
+              {{ selectedItem?.itemName | titlecase }}
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <img
+              [src]="getItemImageUrl(selectedItem?.itemName)"
+              class="img-fluid mb-3"
+              alt="{{ selectedItem?.itemName }}"
+            />
+            <p>
+              <strong>Price:</strong> Rs.
+              {{ selectedItem?.price | currency : "INR" }}
+            </p>
+            <p><strong>Description:</strong> {{ selectedItem?.description }}</p>
+            <p><strong>Ratings:</strong> {{ selectedItem?.ratings }}</p>
+            <p>
+              <strong>Vendor:</strong>
+              {{ getVendorName(selectedItem?.vendorId) }}
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="addToCart(selectedItem)"
+            >
+              Add to Cart
+            </button>
+          </div>
         </div>
       </div>
     </div>

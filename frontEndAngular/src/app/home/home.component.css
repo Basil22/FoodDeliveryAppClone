@@ -1,45 +1,95 @@
+/* Adjust heading styles */
+h5 {
+  font-weight: 400;
+  color: #000;
+  font-size: 1.75rem;
+  line-height: 2rem;
+  font-family: "Raleway";
+}
+
+.food-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.food-card img {
+  border-radius: 12px;
+  width: 200px;
+  height: 200px;
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  width: 200px;
+  text-align: center;
+  padding: 10px;
+  height: 6rem;
+  border-radius: 0px 0px 6px 6px;
+}
+
+.custom-btn {
+  font-size: 1rem;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 400;
+}
+
+h1 {
+  font-family: "Raleway";
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 0;
+  line-height: 5rem;
+  color: #e24141;
+}
+
+/* Adjust the button */
 
 .card {
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .card:hover {
-    transform: scale(1.05);
-  }
-  
-  .card-img-top {
-    height: 200px;
-    object-fit: cover;
-  }
-  
-  .card-title {
-    font-size: 1.25rem;
-    font-weight: bold;
-  }
-  
-  .card-text {
-    font-size: 0.9rem;
-  }
-  
-  .btn-primary {
-    background-color: #e67c3a;
-    border-color:#e67c3a;
-  }
-  .btn-success {
-    background-color: #e67c3a;
-    border-color: #e67c3a;
-  }
-  .input-group {
-    display: flex;  /* Use flexbox to align items in one line */
-    justify-content: center;
-    padding-left: 20%;
-    padding-right: 20%; /* Center the input and button */
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.card-text {
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background-color: #e24141;
+  border-color: #e24141;
+}
+.btn-success {
+  background-color: #e24141;
+  border-color: #e24141;
+}
+.input-group {
+  display: flex; /* Use flexbox to align items in one line */
+  justify-content: center;
+  padding-left: 20%;
+  padding-right: 20%; /* Center the input and button */
 }
 
 .input-group input {
-    border-right: none; /* Remove border on the right side of the input */
+  border-right: none; /* Remove border on the right side of the input */
 }
 
 .input-group .btn {
-    border-left: none; /* Remove border on the left side of the button */
+  border-left: none; /* Remove border on the left side of the button */
 }
