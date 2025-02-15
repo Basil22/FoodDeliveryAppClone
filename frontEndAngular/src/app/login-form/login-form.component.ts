@@ -27,8 +27,7 @@ export class LoginFormComponent {
     if (this.loginData.userPhoneNumber && this.loginData.userPassword) {
       this.userService.loginUser(this.loginData).subscribe({
         next: (response) => {
-          console.log('Login successful!', response);
-          // console.log('Full Response:', JSON.stringify(response));
+          // console.log('Login successful!', response);
 
           // Store the user ID or token in localStorage
           if (response && response.userId !== undefined) {

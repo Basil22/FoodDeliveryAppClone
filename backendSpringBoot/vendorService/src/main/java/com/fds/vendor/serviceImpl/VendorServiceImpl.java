@@ -31,309 +31,309 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class VendorServiceImpl implements VendorService, ItemService {
 
-	@Autowired
-	private VendorRepository vendorRepo;
+    @Autowired
+    private VendorRepository vendorRepo;
 
-	@Autowired
-	private ItemRepository itemRepo;
+    @Autowired
+    private ItemRepository itemRepo;
 
-	@Autowired
-	private UserServiceClient userServiceClient;
+    @Autowired
+    private UserServiceClient userServiceClient;
 
-	@Autowired
-	private GeocodingService geoService;
+    @Autowired
+    private GeocodingService geoService;
 
-	private static final double EARTH_RADIUS_KM = 6371.0;
+    private static final double EARTH_RADIUS_KM = 6371.0;
 
-	@Override
-	public String addVendor(Vendor vendor) {
+    @Override
+    public String addVendor(Vendor vendor) {
 
-		String vendorName = vendor.getVendorName().toLowerCase();
-		String fssaiLicense = vendor.getFssaiLicenseNumber();
+	String vendorName = vendor.getVendorName().toLowerCase();
+	String fssaiLicense = vendor.getFssaiLicenseNumber();
 
-		if (!validateFssaiLicense(fssaiLicense)) {
-			throw new InvalidFssaiException("Invalid Fssai License Number.");
-		}
+//	if (!validateFssaiLicense(fssaiLicense)) {
+//	    throw new InvalidFssaiException("Invalid Fssai License Number.");
+//	}
 
-		if (vendorRepo.findByVendorContactNumber(vendor.getContactNumber()).isPresent()) {
-			throw new VendorAlreadyExistsException("Contact number: " + vendor.getContactNumber() + " already exits.");
-		}
-
-		if (vendor.getItemList() != null) {
-			for (Items item : vendor.getItemList()) {
-				item.setItemName(item.getItemName().toLowerCase());
-				item.setCategory(item.getCategory().toLowerCase());
-			}
-		}
-
-		vendor.setVendorName(vendorName);
-		vendorRepo.save(vendor);
-		return "Vendor details added.";
+	if (vendorRepo.findByVendorContactNumber(vendor.getContactNumber()).isPresent()) {
+	    throw new VendorAlreadyExistsException("Contact number: " + vendor.getContactNumber() + " already exits.");
 	}
 
-	public boolean validateFssaiLicense(String fssaiLicense) {
-
-		String regex = "^1(0[0-9]|[12][0-9]|3[0-6])([0-9]{2})([0-9]{3})([0-9]{6})$";
-
-		if (!fssaiLicense.matches(regex)) {
-			return false;
-		}
-
-		int licenseYear = Integer.parseInt(fssaiLicense.substring(3, 5));
-		int currentYear = LocalDate.now().getYear() % 100;
-
-		if (licenseYear < currentYear - 5 || licenseYear > currentYear) {
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
-	public String updateVendorNameNumberAddressFssaiByName(String vendorName, Vendor vendor) {
-
-		vendorRepo.findByVendorName(vendorName.toLowerCase()).ifPresentOrElse(v -> {
-			v.setAddress(vendor.getAddress());
-			v.setContactNumber(vendor.getContactNumber());
-			v.setVendorName(vendor.getVendorName().toLowerCase());
-
-			if (!validateFssaiLicense(vendor.getFssaiLicenseNumber())) {
-				throw new InvalidFssaiException("Invalid FSSAI License Number.");
-			}
-
-			v.setFssaiLicenseNumber(vendor.getFssaiLicenseNumber());
-
-			vendorRepo.save(v);
-		}, () -> {
-			throw new VendorDoesNotExistException(vendorName + " does not exist.");
-
-		});
-
-		return "Details Updated";
-	}
-
-	@Override
-	public Vendor viewVendorDetailsByName(String vendorName) {
-		Optional<Vendor> savedVendor = vendorRepo.findByVendorName(vendorName.toLowerCase());
-		return savedVendor.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
-	}
-
-	@Override
-	public String deleteVendorByName(String vendorName) {
-
-		Optional<Vendor> savedVendor = vendorRepo.findByVendorName(vendorName.toLowerCase());
-		if (!savedVendor.isPresent()) {
-			throw new VendorDoesNotExistException(vendorName + " does not exist.");
-		}
-
-		vendorRepo.deleteByVendorName(vendorName);
-		return "Vendor Removed";
-	}
-
-	@Override
-	public void vendorOpenCloseToggle(String vendorName) {
-
-		vendorRepo.findByVendorName(vendorName.toLowerCase()).ifPresentOrElse(e -> {
-			e.setIsOpen(!e.isOpen());
-			vendorRepo.save(e);
-		}, () -> {
-			throw new VendorDoesNotExistException(vendorName + " does not exist.");
-		});
-	}
-
-	@Override
-	public List<Vendor> viewAllVendors() {
-		return vendorRepo.findAll();
-	}
-
-	// ITEMS IMPL
-
-	@Override
-	public String addItemToVendor(Items item, String vendorName) {
-
-		Vendor savedVendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
-				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
-		if (savedVendor.getItemList() == null) {
-			savedVendor.setItemList(new ArrayList<>());
-		}
-
+	if (vendor.getItemList() != null) {
+	    for (Items item : vendor.getItemList()) {
 		item.setItemName(item.getItemName().toLowerCase());
 		item.setCategory(item.getCategory().toLowerCase());
-		boolean itemExists = savedVendor.getItemList().stream()
-				.anyMatch(existingItem -> existingItem.getItemName().equals(item.getItemName()));
-
-		if (itemExists) {
-			throw new ItemExistsException(item.getItemName() + " already exists.");
-		}
-
-		item.setVendor(savedVendor);
-		savedVendor.getItemList().add(item);
-
-		vendorRepo.save(savedVendor);
-		return "Item added.";
+	    }
 	}
 
-	@Override
-	public String updateItemDetailsInVendor(String vendorName, String itemName, Items item) {
+	vendor.setVendorName(vendorName);
+	vendorRepo.save(vendor);
+	return "Vendor details added.";
+    }
 
-		Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
-				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
+    public boolean validateFssaiLicense(String fssaiLicense) {
 
-		if (vendor.getItemList() == null || vendor.getItemList().isEmpty()) {
-			throw new ItemNotFoundException(vendorName + " does not have any items.");
-		}
+//		String regex = "^1(0[0-9]|[12][0-9]|3[0-6])([0-9]{2})([0-9]{3})([0-9]{6})$";
+//
+//		if (!fssaiLicense.matches(regex)) {
+//			return false;
+//		}
 
-		Items savedItem = vendor.getItemList().stream()
-				.filter(existingItem -> existingItem.getItemName().equals(itemName.toLowerCase())).findFirst()
-				.orElseThrow(() -> new ItemNotFoundException(itemName + " does not exist in " + vendorName));
+	int licenseYear = Integer.parseInt(fssaiLicense.substring(3, 5));
+	int currentYear = LocalDate.now().getYear() % 100;
 
-		savedItem.setItemName(item.getItemName());
-		savedItem.setCategory(item.getCategory());
-		savedItem.setDescription(item.getDescription());
-		savedItem.setPrice(item.getPrice());
-		savedItem.setRatings(item.getRatings());
-
-		vendorRepo.save(vendor);
-
-		return "Item details updated successfully";
+	if (licenseYear < currentYear - 5 || licenseYear > currentYear) {
+	    return false;
 	}
 
-	@Override
-	public String deleteItemFromVendor(String vendorName, String itemName) {
-		Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
-				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
+	return true;
+    }
 
-		if (vendor.getItemList() == null || vendor.getItemList().isEmpty()) {
-			throw new ItemNotFoundException(vendorName + " does not have any items.");
-		}
+    @Override
+    public String updateVendorNameNumberAddressFssaiByName(String vendorName, Vendor vendor) {
 
-		Items savedItem = vendor.getItemList().stream()
-				.filter(existingItem -> existingItem.getItemName().equals(itemName.toLowerCase())).findFirst()
-				.orElseThrow(() -> new ItemNotFoundException(itemName + " does not exist in " + vendorName));
+	vendorRepo.findByVendorName(vendorName.toLowerCase()).ifPresentOrElse(v -> {
+	    v.setAddress(vendor.getAddress());
+	    v.setContactNumber(vendor.getContactNumber());
+	    v.setVendorName(vendor.getVendorName().toLowerCase());
 
-		vendor.getItemList().remove(savedItem);
-		vendorRepo.save(vendor);
+	    if (!validateFssaiLicense(vendor.getFssaiLicenseNumber())) {
+		throw new InvalidFssaiException("Invalid FSSAI License Number.");
+	    }
 
-		return "Item " + itemName + " has been deleted from " + vendorName;
+	    v.setFssaiLicenseNumber(vendor.getFssaiLicenseNumber());
+
+	    vendorRepo.save(v);
+	}, () -> {
+	    throw new VendorDoesNotExistException(vendorName + " does not exist.");
+
+	});
+
+	return "Details Updated";
+    }
+
+    @Override
+    public Vendor viewVendorDetailsByName(String vendorName) {
+	Optional<Vendor> savedVendor = vendorRepo.findByVendorName(vendorName.toLowerCase());
+	return savedVendor.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
+    }
+
+    @Override
+    public String deleteVendorByName(String vendorName) {
+
+	Optional<Vendor> savedVendor = vendorRepo.findByVendorName(vendorName.toLowerCase());
+	if (!savedVendor.isPresent()) {
+	    throw new VendorDoesNotExistException(vendorName + " does not exist.");
 	}
 
-	@Override
-	public Items viewItemInRestaurant(String vendorName, String itemName) {
+	vendorRepo.deleteByVendorName(vendorName);
+	return "Vendor Removed";
+    }
 
-		Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
-				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
+    @Override
+    public void vendorOpenCloseToggle(String vendorName) {
 
-		if (vendor.getItemList() == null || vendor.getItemList().isEmpty()) {
-			throw new ItemNotFoundException(vendorName + " does not have any items.");
-		}
+	vendorRepo.findByVendorName(vendorName.toLowerCase()).ifPresentOrElse(e -> {
+	    e.setIsOpen(!e.isOpen());
+	    vendorRepo.save(e);
+	}, () -> {
+	    throw new VendorDoesNotExistException(vendorName + " does not exist.");
+	});
+    }
 
-		Items existingItem = vendor.getItemList().stream().filter(item -> item.getItemName().equals(itemName.toLowerCase()))
-				.findFirst()
-				.orElseThrow(() -> new ItemNotFoundException(itemName + " does not exist in " + vendorName));
+    @Override
+    public List<Vendor> viewAllVendors() {
+	return vendorRepo.findAll();
+    }
 
-		return existingItem;
+    // ITEMS IMPL
+
+    @Override
+    public String addItemToVendor(Items item, String vendorName) {
+
+	Vendor savedVendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
+		.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
+	if (savedVendor.getItemList() == null) {
+	    savedVendor.setItemList(new ArrayList<>());
 	}
 
-	@Override
-	public void itemAvailabilityToggle(String vendorName, String itemName) {
-		Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
-				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
+	item.setItemName(item.getItemName().toLowerCase());
+	item.setCategory(item.getCategory().toLowerCase());
+	boolean itemExists = savedVendor.getItemList().stream()
+		.anyMatch(existingItem -> existingItem.getItemName().equals(item.getItemName()));
 
-		if (vendor.getItemList() == null || vendor.getItemList().isEmpty()) {
-			throw new ItemNotFoundException(vendorName + " does not have any items.");
-		}
-
-		Items savedItem = vendor.getItemList().stream()
-				.filter(existingItem -> existingItem.getItemName().equals(itemName.toLowerCase())).findFirst()
-				.orElseThrow(() -> new ItemNotFoundException(itemName + " does not exist in " + vendorName));
-
-		savedItem.setIsAvailable(!savedItem.isAvailable());
-
+	if (itemExists) {
+	    throw new ItemExistsException(item.getItemName() + " already exists.");
 	}
 
-	@Override
-	public List<Items> viewItemsInVendor(String vendorName) {
-		Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
-				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
+	item.setVendor(savedVendor);
+	savedVendor.getItemList().add(item);
 
-		return vendor.getItemList();
+	vendorRepo.save(savedVendor);
+	return "Item added.";
+    }
+
+    @Override
+    public String updateItemDetailsInVendor(String vendorName, String itemName, Items item) {
+
+	Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
+		.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
+
+	if (vendor.getItemList() == null || vendor.getItemList().isEmpty()) {
+	    throw new ItemNotFoundException(vendorName + " does not have any items.");
 	}
 
-	@Override
-	public List<Vendor> allVendorsWithItem(String itemName) {
+	Items savedItem = vendor.getItemList().stream()
+		.filter(existingItem -> existingItem.getItemName().equals(itemName.toLowerCase())).findFirst()
+		.orElseThrow(() -> new ItemNotFoundException(itemName + " does not exist in " + vendorName));
 
-		List<Vendor> vendors = itemRepo.findVendorsByItemName(itemName.toLowerCase());
-		if (vendors.isEmpty()) {
-			throw new ItemNotFoundException(itemName + " not found in any vendor.");
-		}
+	savedItem.setItemName(item.getItemName());
+	savedItem.setCategory(item.getCategory());
+	savedItem.setDescription(item.getDescription());
+	savedItem.setPrice(item.getPrice());
+	savedItem.setRatings(item.getRatings());
 
-		return vendors;
+	vendorRepo.save(vendor);
+
+	return "Item details updated successfully";
+    }
+
+    @Override
+    public String deleteItemFromVendor(String vendorName, String itemName) {
+	Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
+		.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
+
+	if (vendor.getItemList() == null || vendor.getItemList().isEmpty()) {
+	    throw new ItemNotFoundException(vendorName + " does not have any items.");
 	}
 
-	@Override
-	public List<Items> allAvailableItemsInVendor(String vendorName) {
-		Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
-				.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
+	Items savedItem = vendor.getItemList().stream()
+		.filter(existingItem -> existingItem.getItemName().equals(itemName.toLowerCase())).findFirst()
+		.orElseThrow(() -> new ItemNotFoundException(itemName + " does not exist in " + vendorName));
 
-		return vendor.getItemList().stream().filter(item -> item.isAvailable() == true).toList();
+	vendor.getItemList().remove(savedItem);
+	vendorRepo.save(vendor);
+
+	return "Item " + itemName + " has been deleted from " + vendorName;
+    }
+
+    @Override
+    public Items viewItemInRestaurant(String vendorName, String itemName) {
+
+	Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
+		.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
+
+	if (vendor.getItemList() == null || vendor.getItemList().isEmpty()) {
+	    throw new ItemNotFoundException(vendorName + " does not have any items.");
 	}
 
-	@Override
-	public List<Vendor> getNearestVendors(long userId) {
+	Items existingItem = vendor.getItemList().stream()
+		.filter(item -> item.getItemName().equals(itemName.toLowerCase())).findFirst()
+		.orElseThrow(() -> new ItemNotFoundException(itemName + " does not exist in " + vendorName));
 
-		UserDTO user = userServiceClient.getByUserId(userId);
-		String userAddress = user.getUserAddress();
+	return existingItem;
+    }
 
-		Coordinates userCoordinates = geoService.getCoordinates(userAddress);
+    @Override
+    public void itemAvailabilityToggle(String vendorName, String itemName) {
+	Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
+		.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
 
-		List<Vendor> allVendors = vendorRepo.findAll();
-
-		return allVendors.stream().filter(vendor -> {
-			String vendorAddress = vendor.getAddress();
-			Coordinates vendorCoordinates = geoService.getCoordinates(vendorAddress);
-			double distance = calculateDistance(userCoordinates, vendorCoordinates);
-			return distance <= 7.0;
-		}).collect(Collectors.toList());
+	if (vendor.getItemList() == null || vendor.getItemList().isEmpty()) {
+	    throw new ItemNotFoundException(vendorName + " does not have any items.");
 	}
 
-	// Calculate distance using haversine formula
-	private double calculateDistance(Coordinates coord1, Coordinates coord2) {
+	Items savedItem = vendor.getItemList().stream()
+		.filter(existingItem -> existingItem.getItemName().equals(itemName.toLowerCase())).findFirst()
+		.orElseThrow(() -> new ItemNotFoundException(itemName + " does not exist in " + vendorName));
 
-		double lat1 = Math.toRadians(coord1.getLatitude());
-		double lon1 = Math.toRadians(coord1.getLongitude());
-		double lat2 = Math.toRadians(coord2.getLatitude());
-		double lon2 = Math.toRadians(coord2.getLongitude());
+	savedItem.setIsAvailable(!savedItem.isAvailable());
 
-		double dLat = lat2 - lat1;
-		double dLon = lon2 - lon1;
+    }
 
-		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-				+ Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    @Override
+    public List<Items> viewItemsInVendor(String vendorName) {
+	Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
+		.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
 
-		return EARTH_RADIUS_KM * c;
+	return vendor.getItemList();
+    }
+
+    @Override
+    public List<Vendor> allVendorsWithItem(String itemName) {
+
+	List<Vendor> vendors = itemRepo.findVendorsByItemName(itemName.toLowerCase());
+	if (vendors.isEmpty()) {
+	    throw new ItemNotFoundException(itemName + " not found in any vendor.");
 	}
 
-	@Override
-	public Integer getDistanceBetweenVendorAndUser(long userId, int vendorId) {
+	return vendors;
+    }
 
-		String userAddress = userServiceClient.getByUserId(userId).getUserAddress();
-		Coordinates userCoordinates = geoService.getCoordinates(userAddress);
+    @Override
+    public List<Items> allAvailableItemsInVendor(String vendorName) {
+	Vendor vendor = vendorRepo.findByVendorName(vendorName.toLowerCase())
+		.orElseThrow(() -> new VendorDoesNotExistException(vendorName + " does not exist."));
 
-		Vendor vendor = vendorRepo.findById(vendorId)
-				.orElseThrow(() -> new VendorDoesNotExistException("Vendor does not exist."));
-		Coordinates vendorCoordinates = geoService.getCoordinates(vendor.getAddress());
+	return vendor.getItemList().stream().filter(item -> item.isAvailable() == true).toList();
+    }
 
-		return (int) calculateDistance(userCoordinates, vendorCoordinates);
-	}
+    @Override
+    public List<Vendor> getNearestVendors(long userId) {
 
-	@Override
-	public List<Items> viewAllItems() {
-		return itemRepo.findAll();
-	}
-	
-	@Override
+	UserDTO user = userServiceClient.getByUserId(userId);
+	String userAddress = user.getUserAddress();
+
+	Coordinates userCoordinates = geoService.getCoordinates(userAddress);
+
+	List<Vendor> allVendors = vendorRepo.findAll();
+
+	return allVendors.stream().filter(vendor -> {
+	    String vendorAddress = vendor.getAddress();
+	    Coordinates vendorCoordinates = geoService.getCoordinates(vendorAddress);
+	    double distance = calculateDistance(userCoordinates, vendorCoordinates);
+	    return distance <= 7.0;
+	}).collect(Collectors.toList());
+    }
+
+    // Calculate distance using haversine formula
+    private double calculateDistance(Coordinates coord1, Coordinates coord2) {
+
+	double lat1 = Math.toRadians(coord1.getLatitude());
+	double lon1 = Math.toRadians(coord1.getLongitude());
+	double lat2 = Math.toRadians(coord2.getLatitude());
+	double lon2 = Math.toRadians(coord2.getLongitude());
+
+	double dLat = lat2 - lat1;
+	double dLon = lon2 - lon1;
+
+	double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+		+ Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+	double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+	return EARTH_RADIUS_KM * c;
+    }
+
+    @Override
+    public Integer getDistanceBetweenVendorAndUser(long userId, int vendorId) {
+
+	String userAddress = userServiceClient.getByUserId(userId).getUserAddress();
+	Coordinates userCoordinates = geoService.getCoordinates(userAddress);
+
+	Vendor vendor = vendorRepo.findById(vendorId)
+		.orElseThrow(() -> new VendorDoesNotExistException("Vendor does not exist."));
+	Coordinates vendorCoordinates = geoService.getCoordinates(vendor.getAddress());
+
+	return (int) calculateDistance(userCoordinates, vendorCoordinates);
+    }
+
+    @Override
+    public List<Items> viewAllItems() {
+	return itemRepo.findAll();
+    }
+
+    @Override
     public Optional<Items> getItemByName(String itemName) {
-        return itemRepo.findByItemName(itemName); // Call the repository method to fetch item
+	return itemRepo.findByItemName(itemName); // Call the repository method to fetch item
     }
 }
