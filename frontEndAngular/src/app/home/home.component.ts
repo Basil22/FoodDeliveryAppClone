@@ -38,8 +38,7 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.getItems();
-    this.getVendors();
+    this.getAllVendors();
   }
 
   getItems(): void {
@@ -51,7 +50,7 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  getVendors(): void {
+  getAllVendors(): void {
     this.vendorService.getAllVendors().subscribe((data: Vendor[]) => {
       this.vendors = data;
 
