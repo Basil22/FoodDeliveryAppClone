@@ -14,10 +14,12 @@ export class VendorService {
 
   // Method to fetch vendors by item name
   getVendorsByItemName(itemName: string): Observable<Vendor[]> {
-    console.log('Item Name:', itemName);
-
     const encodedItemName = encodeURIComponent(itemName);
     return this.http.get<Vendor[]>(`${this.apiUrl}/items/${encodedItemName}`);
+  }
+
+  addVendorDetails(vendor: Vendor): Observable<Vendor> {
+    return this.http.post<Vendor>(`${this.apiUrl}/add`, vendor);
   }
 
   getAllVendors(): Observable<Vendor[]> {
